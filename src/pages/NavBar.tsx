@@ -1,16 +1,18 @@
-import { styled, Box, Typography, Button, Chip, Paper   } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { ChipC } from '../component/ChipC'
-import { Color } from '../data/color'
-import { useLog } from '../util/useLog'
+
+import { ListBreakPointButton } from '../component'
+import { Color } from '../data'
 
 export function NavBar(){
     return(
-        <Box sx={{justifyContent:'flex-start', backgroundColor:Color.darkBlue}}>
+        <Box sx={{justifyContent:'flex-start', backgroundColor:Color.Color.darkBlue}}>
             <Box sx={{textAlign:'right',pt:'1rem',pr:'1rem',pb:'0.5rem'}}>
-                <Link to="/" className='no-underline'><Typography variant="h5" component="h5" className="tw">
-                    해연갤 대피소
-                </Typography ></Link>
+                <Link to="/" className='no-underline'>
+                    <Typography variant="h5" component="h5" className="tw">
+                        해연갤 대피소
+                    </Typography >
+                </Link>
             </Box> 
             <Box
                 sx={{
@@ -22,10 +24,10 @@ export function NavBar(){
                 }}
                 className='tw'
             >
-                <ChipC label="전체글" breakPoint={-1} />
-                <ChipC label="50" breakPoint={50}/>
-                <ChipC label="100" breakPoint={100} />
-                <ChipC label="200" breakPoint={200}/>
+                <ListBreakPointButton label="전체글" breakPoint={-1} />
+                <ListBreakPointButton label="50" breakPoint={50}/>
+                <ListBreakPointButton label="100" breakPoint={100} />
+                <ListBreakPointButton label="200" breakPoint={200}/>
             </Box>
         </Box>
     )

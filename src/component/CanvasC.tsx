@@ -1,28 +1,24 @@
 import { SearchBar } from "./SearchBar"
 import { useState } from "react"
 import { Paper, TextField, InputBase, Box, Button } from "@mui/material"
-import { Color } from "../data/color"
+import { Color } from "../data/Color"
+import { Length } from "../data"
 
 export function CanvasC(){
     return(
         <>
-            <Paper sx={{height:window.innerHeight - 170}}>
+            <Paper sx={{height:Length.MiddlePaperSize}}>
                 <InputBase 
                     fullWidth
-                    sx={{ height : '3.5rem'}}
-                    placeholder="제목"/>
-                {/* <TextField
-                    fullWidth 
-                    multiline
-                    maxRows={10000}
-                    rows={(window.innerHeight - 170)/26}
-                /> */}
+                    sx={{ height : '3.5rem', p : 2}}
+                    placeholder="제목"
+                />
                 <hr />
                 <InputBase 
                     fullWidth
                     multiline
-                    rows={(window.innerHeight - 170)/26}
-                    sx={{ height : '3.5rem' }}
+                    rows={Length.MiddlePaperSize/26}
+                    sx={{ height : '3.5rem', p : 2 }}
                     placeholder="본문"/> 
             </Paper>
             <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.darkBlue}}>
