@@ -1,10 +1,7 @@
-import { CanvasC } from "../component/CanvasC"
-import { SearchBar } from "../component/SearchBar"
+import { Canvas } from "../component"
 
 export function New(){
     return(
-        <>
-            <CanvasC />
-        </>
+        <Canvas />
     )
 }

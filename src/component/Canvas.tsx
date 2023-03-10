@@ -1,10 +1,8 @@
-import { SearchBar } from "./SearchBar"
-import { useState } from "react"
 import { Paper, TextField, InputBase, Box, Button } from "@mui/material"
-import { Color } from "../data/Color"
-import { Length } from "../data"
 
-export function CanvasC(){
+import { Length, Color } from "../data"
+
+export function Canvas(){
     return(
         <>
             <Paper sx={{height:Length.MiddlePaperSize}}>
@@ -21,7 +19,7 @@ export function CanvasC(){
                     sx={{ height : '3.5rem', p : 2 }}
                     placeholder="본문"/> 
             </Paper>
-            <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.darkBlue}}>
+            <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.Color.darkBlue}}>
                 <Button variant="contained">저장</Button>
             </Box>
         </>
