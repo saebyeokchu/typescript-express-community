@@ -10,7 +10,6 @@ export function Canvas(){
                 <TextField
                     fullWidth 
                     multiline
-                    maxRows={10000}
                     rows={(window.innerHeight - 170)/24}
                 />
             </Paper>
