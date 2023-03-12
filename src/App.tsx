@@ -1,9 +1,13 @@
-import { NavBar } from "./pages/NavBar"
 import {BrowserRouter, Route, Routes} from "react-router-dom"
-import { MainList } from "./pages/MainList"
-import { Canvas } from "./pages/Canvas"
 import { Container, Chip } from "@mui/material"
 import { HygallProvider } from "./context/HygallContext"
+
+import {
+  Main,
+  Detail,
+  NavBar,
+  New
+} from './pages'
 
 function App(){
   return (
@@ -11,8 +15,9 @@ function App(){
       <Container>
         <NavBar />
         <Routes>
-          <Route path="/" element={<MainList />} />
-          <Route path="/canvas" element={<Canvas />} />
+          <Route path="/" element={<Main />} />
+          <Route path="/detail" element={<Detail />} />
+          <Route path="/new" element={<New />} />
         </Routes>
       </Container>
     </HygallProvider>
