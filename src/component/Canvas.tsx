@@ -19,7 +19,7 @@ export function Canvas(){
                     sx={{ height : '3.5rem', p : 2 }}
                     placeholder="본문"/> 
             </Paper>
-            <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.Color.darkBlue}}>
+            <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.Code.darkBlue}}>
                 <Button variant="contained">저장</Button>
             </Box>
         </>

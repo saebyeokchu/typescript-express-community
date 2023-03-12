@@ -6,7 +6,7 @@ import { Color } from '../data'
 
 export function NavBar(){
     return(
-        <Box sx={{justifyContent:'flex-start', backgroundColor:Color.Color.darkBlue}}>
+        <Box sx={{justifyContent:'flex-start', backgroundColor:Color.Code.darkBlue}}>
             <Box sx={{textAlign:'right',pt:'1rem',pr:'1rem',pb:'0.5rem'}}>
                 <Link to="/" className='no-underline'>
                     <Typography variant="h5" component="h5" className="tw">
