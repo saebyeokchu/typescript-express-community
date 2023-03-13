@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination} from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress} from '@mui/material'
 
 import { List, Length, Color } from '../data';
+import { useHygallContext } from '../context/HygallContext';
 
 
 interface TablePaginationActionsProps {
@@ -38,7 +39,7 @@ function TablePaginationActions(props : TablePaginationActionsProps){
   }
 
   const handlePaginationClick = (
-    event : React.ChangeEvent<HTMLButtonElement>,
+    event : React.ChangeEvent<unknown>,
     value : number
   ) => { 
     onPageChange(event,value-1)
@@ -58,18 +59,18 @@ export function ContentsList() {
   const navigate = useNavigate();
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
+  const { mainList } = useHygallContext()
 
-
-  //temporaly generated
-  const rows = [];
-  for(let i = 0;i<50;i++){
-    rows.push({...List.Template, index : i+1})
+  if(mainList === undefined) {
+    //loading
+    return <CircularProgress />
   }
 
-  const emptyRows = page > 0? Math.max(0, (1+page) *rowsPerPage-rows.length) : 0;
+  //temporaly generated
+  const emptyRows = page > 0? Math.max(0, (1+page) *rowsPerPage-mainList.length) : 0;
 
-  const handleChangePage = (
-    event : React.MouseEvent<HTMLButtonElement> | null,
+  const handleChangePage = ( 
+    event : React.ChangeEvent<unknown>,
     newPage : number
   ) => {
     setPage(newPage)
@@ -98,17 +99,17 @@ export function ContentsList() {
         <TableBody>
           {(
               rowsPerPage > 0 ?
-              rows.slice(page * rowsPerPage, page*rowsPerPage+rowsPerPage) : rows
+              mainList.slice(page * rowsPerPage, page*rowsPerPage+rowsPerPage) : mainList
             ).map((row, index) => (
             <TableRow
-              key={`main-write-${row.index}`}
+              key={`main-write-${index}`}
               sx={{'&:last-child td, &:last-child th': { border: 0 }}}
             >
               <TableCell component="th" scope="row">
-                {row.index}
+                {index}
               </TableCell>
               <TableCell align="center">{row.title}</TableCell>
-              <TableCell align="center">{row.readCount}</TableCell>
+              <TableCell align="center">{row.viewCount}</TableCell>
               <TableCell align="center">{row.createdAt}</TableCell>
             </TableRow>
           ))}
@@ -124,7 +125,7 @@ export function ContentsList() {
 
       </Table>
       <TablePaginationActions 
-              count={rows.length}
+              count={mainList.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -209,17 +210,17 @@ export function ContentsList() {
 // }
 
 // export default function TableC() {
-//   const rows = [];
+//   const mainList = [];
 
 //   for(let i = 0;i<30;i++){
-//     rows.push({...write, index : i+1})
+//     mainList.push({...write, index : i+1})
 //   }
 
 
 //   const [page, setPage] = useState(0)
 //   const [rowsPerPage, setRowsPerPage] = useState(10)
 
-//   const emptyRows = page > 0? Math.max(0, (1+page) *rowsPerPage-rows.length) : 0;
+//   const emptyRows = page > 0? Math.max(0, (1+page) *rowsPerPage-mainList.length) : 0;
 
 //   const handleChangePage = (
 //     event : React.MouseEvent<HTMLButtonElement> | null,
@@ -253,7 +254,7 @@ export function ContentsList() {
 //           {
 //             (
 //               rowsPerPage > 0 ?
-//               rows.slice(page * rowsPerPage, page*rowsPerPage+rowsPerPage) : rows
+//               mainList.slice(page * rowsPerPage, page*rowsPerPage+rowsPerPage) : mainList
 //             ).map((row, index) => (
 //             <TableRow
 //               key={`main-write-${row.index}`}
@@ -279,12 +280,12 @@ export function ContentsList() {
 //           <TableRow>
 //           <TablePagination
 //             rowsPerPageOptions={[]}
-//             count={rows.length}
+//             count={mainList.length}
 //             rowsPerPage={rowsPerPage}
 //             page={page}
 //             SelectProps={{
 //               inputProps : {
-//                 'aria-label' : 'rows per page'
+//                 'aria-label' : 'mainList per page'
 //               },
 //               native : true
 //             }}
