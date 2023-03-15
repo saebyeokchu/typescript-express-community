@@ -27,7 +27,16 @@ export function HygallProvider ({children} : HygallProviderPros){
     const [listBreakPoint, setListBreakPoint] = useState(-1)
     const [mainList, setMainList] = useState<Write.MainList[]>([])
 
-    const getMainList = () => setMainList(hygallRepository.getAllMainList())
+    const getMainList = () => {
+        const response :Promise<Number | Write.MainList[]> = hygallRepository.getAllMainList();
+        response.then((r) => {
+            if(typeof r === "number"){
+                console.log("no data")
+            }else{
+                setMainList(r)
+            }
+        })
+    }
 
     const changeListBreakPoint = (breakPoint : number) => setListBreakPoint(breakPoint)
 

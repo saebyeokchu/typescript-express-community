@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 
-import {Box} from '@mui/material'
+import {Box, CircularProgress, Paper} from '@mui/material'
 import { SearchBar, ContentsList } from '../component'
 import { useHygallContext } from '../context/HygallContext'
+import { Length } from '../data'
 
 export function Main(){
     const { listBreakPoint, getMainList, mainList } = useHygallContext()
@@ -12,9 +13,17 @@ export function Main(){
     },[listBreakPoint])
 
     return (
-        <>
-            <ContentsList />
-            <SearchBar />
+        <>  
+            {mainList === undefined ? 
+            <Paper className="center-box" sx={{height:Length.MiddlePaperSize}}>
+                <CircularProgress />
+            </Paper> 
+            :
+            <>
+                <ContentsList />
+                <SearchBar />
+            </>
+            }
         </>
     )
 }
