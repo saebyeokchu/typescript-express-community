@@ -11,12 +11,8 @@ type ListBreakPointButtonProps = {
 
 export function ListBreakPointButton({label, breakPoint} : ListBreakPointButtonProps){
     const [onHover, setOnHover] = useState(false)
-    const { listBreakPoint, changeListBreakPoint } = useHygallContext()
+    const { listBreakPoint, setListBreakPoint } = useHygallContext()
     const selected = listBreakPoint === breakPoint
-
-    function setBreakPoint(){
-        changeListBreakPoint(breakPoint)
-    }
 
     return(
         <Link to="/" className="no-underline">
@@ -24,7 +20,7 @@ export function ListBreakPointButton({label, breakPoint} : ListBreakPointButtonP
                 label={label} 
                 sx={{color:'white', backgroundColor:`rgba(255, 255, 255, ${onHover || selected ? ".5" : ""})!important`}}
                 variant="outlined"
-                onClick={setBreakPoint}  
+                onClick={() => setListBreakPoint(breakPoint)}  
                 onMouseOver={()=>setOnHover(true)}
                 onMouseOut={()=>setOnHover(false)}
             />

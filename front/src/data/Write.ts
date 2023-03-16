@@ -7,6 +7,7 @@ const Template : MainList = { //temp
 
 class MainList {
     // index : number = -1
+    contentId : number = -1
     title : string = ""
     createdAt : string = ""
     viewCount : number = -1

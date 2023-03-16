@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress} from '@mui/material'
 
-import { List, Length, Color } from '../data';
+import { List, Length, Color, Write } from '../data';
 import { useHygallContext } from '../context/HygallContext';
 
 
@@ -19,8 +19,6 @@ interface TablePaginationActionsProps {
 function TablePaginationActions(props : TablePaginationActionsProps){
   const { count, page, rowsPerPage, onPageChange } = props
   const totalPage = Math.floor( (count % rowsPerPage) && (count % rowsPerPage)  ? count / rowsPerPage + 1 : count / rowsPerPage)
-
-  console.log(totalPage)
 
   const handleFirstPageButtonClick = (
     event : React.MouseEvent<HTMLButtonElement>,
@@ -41,7 +39,7 @@ function TablePaginationActions(props : TablePaginationActionsProps){
   }
 
   const handlePaginationClick = (
-    event : React.ChangeEvent<unknown>,
+    event : React.ChangeEvent<HTMLButtonElement>,
     value : number
   ) => { 
     onPageChange(event,value-1)
@@ -61,16 +59,25 @@ export function ContentsList() {
   const navigate = useNavigate();
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const { mainList, listBreakPoint } = useHygallContext()
+  const { filteredMainList, searchTargetData, appendSearchTargetData } = useHygallContext()
 
-  if(mainList === undefined) {
+  if(filteredMainList === undefined) {
     return <span />
   }
 
-  const filteredMainList = mainList.filter(l => l.viewCount >= listBreakPoint)
+  useEffect(() => {
+    //search용 데이터 묶음 만들기
+    //새로고침하면 새로 생겨야 하니까 state생성
+    filteredMainList.map(e => {
+      //여러번 반복을 안할 수 있는 방법은 없을까?
+      if(searchTargetData.find(e2 => e2.contentId === e.contentId) === undefined){
+        appendSearchTargetData({contentId : e.contentId, title : e.title})
+      }
+    })},[filteredMainList])
+  
 
   //temporaly generated
-  const emptyRows = page > 0? Math.max(0, (1+page) *rowsPerPage-mainList.length) : 0;
+  const emptyRows = page > 0? Math.max(0, (1+page) *rowsPerPage-filteredMainList.length) : 0;
 
   const handleChangePage = ( 
     event : React.ChangeEvent<unknown>,
@@ -85,6 +92,7 @@ export function ContentsList() {
     setRowsPerPage(parseInt(event.target.value, 10))
     setPage(0)
   }
+  // console.log("ContentsList : ", filteredMainList, searchTargetData)
 
   return (
     <>
