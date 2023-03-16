@@ -4,19 +4,13 @@ import HygallRepositoryInterface from './HygallRepositoryInterface';
 
 export default class HygallRepository implements HygallRepositoryInterface{
 
-    getAllMainList() : Write.MainList[]{
-        //db가져오기
-        axios.get("http://127.0.0.1:4000/getData").then(result => {
-            console.log(result);
+    async getAllMainList() : Promise<Number | Write.MainList[]>{
+        return await axios.get("http://127.0.0.1:4000/get").then(response => {
+            if(response.status === 200){
+                return response.data;
+            }else{
+                return response.status;
+            }
         });
-        
-        //모델 작업 나중에
-        const tempList : Write.MainList[] = [];
-
-        for(let i=0;i<50;i++){
-            tempList.push(Write.Template) 
-        }
-
-        return tempList
     }
 }

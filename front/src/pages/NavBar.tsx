@@ -10,7 +10,8 @@ export function NavBar(){
             <Box sx={{textAlign:'right',pt:'1rem',pr:'1rem',pb:'0.5rem'}}>
                 <Link to="/" className='no-underline'>
                     <Typography variant="h5" component="h5" className="tw">
-                        해연갤 대피소
+                        {/* 해연갤 대피소 */}
+                        MES SCHEDUELR
                     </Typography >
                 </Link>
             </Box> 

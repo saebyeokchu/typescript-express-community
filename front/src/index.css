@@ -13,3 +13,11 @@
 .to-cursor-pointer {
   cursor: pointer;
 }
+
+.center-box{
+  display: flex;
+  align-items: center;
+  text-align: center;
+  vertical-align: middle;
+  justify-content: center;
+}
