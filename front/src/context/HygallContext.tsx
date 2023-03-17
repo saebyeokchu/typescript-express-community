@@ -1,11 +1,10 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { Write } from "../data";
+import { Write, Content } from "../data";
 import HygallRepository from "./HygallRepository";
 
 type HygallProviderPros = {
     children : ReactNode
 }
-
 
 type SearchTargetData = {
     contentId : number
@@ -17,6 +16,7 @@ type HygallContext = { //get, change, set
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : SearchTargetData) => void
     setSearchKeyword : (keyword : string) => void
+    addContent : (title : string, content : string) => void
 
     mainList : Write.MainList[]
     filteredMainList : Write.MainList[]
@@ -71,12 +71,22 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     }
 
+    const addContent = (title : string | undefined, content : string | undefined) => {
+        //둘중 하나라도 값이 없으면 리턴
+        // if(!title || !content) {
+        //     return;
+        // }
+        
+        hygallRepository.addContent(new Content.Content({title : title, content : content}))
+    }
+
     return(
         <HygallContext.Provider value={{
             appendSearchTargetData,
             getMainList,
             setListBreakPoint,
             setSearchKeyword,
+            addContent,
             mainList,
             filteredMainList,
             listBreakPoint,

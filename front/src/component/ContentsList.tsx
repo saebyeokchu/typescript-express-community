@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress} from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress, Chip} from '@mui/material'
 
 import { List, Length, Color, Write } from '../data';
 import { useHygallContext } from '../context/HygallContext';
@@ -118,7 +118,10 @@ export function ContentsList() {
                   <TableCell component="th" scope="row">
                     {page * rowsPerPage + index + 1 }
                   </TableCell>
-                  <TableCell align="center">{row.title}</TableCell>
+                  <TableCell align="center">
+                    {row.title}
+                    <Chip label={row.commentCount}/>
+                  </TableCell>
                   <TableCell align="center">{row.viewCount}</TableCell>
                   <TableCell align="center">{row.createdAt}</TableCell>
                 </TableRow>
