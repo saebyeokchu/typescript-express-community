@@ -5,7 +5,7 @@ async function get(){
 }
 
 function addContent(newContent){
-    contents.insertOne(newContent);
+    return contents.insertMany([newContent]);
 }
 
 const express = require("express");
@@ -37,23 +37,11 @@ router.route("/get").get(function(req, res){
         res.send(items)
     })
 })
-router.route("/add").post(function(req, res){
-    console.log("query => " + req.query)
+app.post("/add", function(req, res){
     console.log(req.body)
-    console.log(req.params)
-    console.log(req)
-})
-
-//post params
-router.route("/postReqTest").post(function(req,res){
-    console.log(req.body)
-    console.log(req.params)
-
-})
-
-//get params
-router.route("/test/:tests").get(function(req, res){
-    console.log(req.params)
+    addContent(req.body).then(function(response){
+        res.send(response)
+    }) 
 })
 
 app.listen(PORT, function() {

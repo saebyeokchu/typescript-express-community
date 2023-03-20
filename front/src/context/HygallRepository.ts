@@ -16,11 +16,9 @@ export default class HygallRepository implements HygallRepositoryInterface{
         });
     }
 
-    addContent(newContent : Content.Content) : void { //async 필요없음
-        console.log(JSON.stringify(newContent))
-
-        axios.post(`${tempApiUrl}/postReqTest`,).then(response => {
-            console.log(response)
+    async addContent(newContent : Content.Content) : Promise<boolean> { //async 필요없음
+        return await axios.post(`${tempApiUrl}/add`,newContent).then(response => {
+            return response.status === 200
         });
     }
 }

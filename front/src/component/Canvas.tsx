@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Paper, TextField, InputBase, Box, Button } from "@mui/material"
+import { Paper, Alert, InputBase, Box, Button } from "@mui/material"
 
-import { Length, Color } from "../data"
+import { Length, Color, Messages } from "../data"
 import { useHygallContext } from "../context/HygallContext";
 
 import ReactQuill from 'react-quill';
@@ -13,10 +13,33 @@ export function Canvas(){
     const {addContent} = useHygallContext()
     const titleRef = useRef<string>()
     let contentRef = useRef<any>()
+    const [alertMessage, setAlertMessage] = useState<JSX.Element>(<Alert severity="success">성공했어요</Alert>)
+
     var toolbarOptions = [ //이미지 핸들러 구현해야함
         ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
         ['image'],
       ];
+
+    const save = () => {
+        if(!titleRef || !contentRef){
+            return;
+        }
+
+        if(!titleRef.current){
+            return;
+        } 
+
+        addContent(titleRef.current.value , contentRef.current.value).then(res => {
+
+            if(res){
+                navigate(-1)
+            }
+            // if(res === Messages.ErrorCode.Success){
+            //     console.log(res)
+            // }
+        })
+    }
+
 
     return(
         <>
@@ -37,7 +60,7 @@ export function Canvas(){
             <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.Code.darkBlue}}>
                 {/* 링크 연결 나중에 */}
                 <Button variant="contained" onClick={() => navigate(-1)}>목록으로</Button> 
-                <Button variant="contained" onClick={() => addContent(titleRef.current.value, contentRef.current.value)}>저장</Button>
+                <Button variant="contained" onClick={() => save()}>저장</Button>
             </Box>
         </>
     )

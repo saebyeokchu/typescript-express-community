@@ -1,3 +1,5 @@
+import moment from "moment"
+
 const Template : Content = {
     contentId : 0,
     title : 'A path from a point approximately 330 metres east of the most south',
@@ -34,13 +36,18 @@ class Content{
     contentId : number = -1
     title : string = ""
     content : string = ""
-    readCount : number = -1
-    viewCount : number = -1
+    commentCount : number = 0
+    viewCount : number = 0
     createdAt : string = ""
     comments : Comment[] = []
 
-    public constructor(init? : Partial<Content>){
+    public constructor(contentLength : number, init? : Partial<Content>){
         Object.assign(this, init)
+
+        //날짜 설정하기
+        console.log(contentLength)
+        this.contentId = contentLength + 1 //나중에 자동 increase 시키면 좋겠다
+        this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")
     }
 }
 
