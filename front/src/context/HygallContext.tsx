@@ -88,12 +88,7 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
 
         return await hygallRepository.addContent(new Content.Content(mainList.length,{title : title, content : content})).then((res)=>{
-            if(res){
-                onAlertStateChange(Messages.ErrorCode.Success)
-            }else{
-                onAlertStateChange(Messages.ErrorCode.AddFail)
-            }
-
+            onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
             return res
         });
     }
