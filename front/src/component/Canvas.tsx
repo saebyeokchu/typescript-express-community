@@ -1,6 +1,6 @@
-import React, { ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useRef, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Paper, Alert, InputBase, Box, Button, TextField } from "@mui/material"
+import { Paper, Alert, InputBase, Box, Button, TextField, inputAdornmentClasses } from "@mui/material"
 
 import { Length, Color, Messages } from "../data"
 import { useHygallContext } from "../context/HygallContext";
@@ -8,18 +8,49 @@ import { useHygallContext } from "../context/HygallContext";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
+//image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
 export function Canvas(){
     const navigate = useNavigate();
     const {addContent} = useHygallContext()
+
     const titleRef = useRef<string>()
     let contentRef = useRef<any>()
     const pwRef = useRef<number>()
-    const [alertMessage, setAlertMessage] = useState<JSX.Element>(<Alert severity="success">성공했어요</Alert>)
 
-    var toolbarOptions = [ //이미지 핸들러 구현해야함
-        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-        ['image'],
-      ];
+    const imageHandler = () =>{
+        const input = document.createElement('input')
+        input.setAttribute('type','file')
+        input.setAttribute('accept', 'image/jpg,image/jpeg,image/png')
+        input.click()
+
+        input.onchange = async () => {
+            const file : File | null = input.files ? input.files[0] : null
+            let data = null
+            const formData = new FormData()
+
+            const quillObj = contentRef.current.getEditor()
+            const range = quillObj.getSelection()
+            
+            console.log(quillObj)
+            console.log(range)
+
+        }
+    }
+
+    const modules = useMemo(() => {
+        return {
+            toolbar : {
+                container : [ //이미지 핸들러 구현해야함
+                    ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                    ['image'],
+                ],
+                handlers : {
+                    image : imageHandler
+                }
+            }
+        }
+    },[])
+
 
     const save = () => {
         if(!titleRef || !contentRef){
@@ -50,7 +81,7 @@ export function Canvas(){
                 <ReactQuill //이미지 첨부
                     theme="snow" 
                     placeholder="본문"
-                    modules={{toolbar : toolbarOptions}}
+                    modules={modules}
                     ref={contentRef}
                     style={{height : Length.MiddlePaperSize - 150}}/>
                 <InputBase //숫자만 accept하기

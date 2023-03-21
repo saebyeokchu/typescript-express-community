@@ -52,7 +52,7 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
     },[mainList, searchKeyword, listBreakPoint])
 
-    function getMainList() {
+    const getMainList = () => {
         //refresh 할때만 불러오면 좋겠다
         const response :Promise<Number | Write.MainList[]> = hygallRepository.getAllMainList();
         response.then((e) => {
@@ -77,20 +77,25 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     async function addContent(title : string | undefined, content : string | undefined){
+
+        console.log("title", title)
+        console.log("content", content)
+        
         //둘중 하나라도 값이 없으면 리턴
-         if(typeof(onAlertStateChange) !== "function"){
-            return false
-         }
+        // block at 0321 for image import
+        //  if(typeof(onAlertStateChange) !== "function"){
+        //     return false
+        //  }
 
-        if(!title || !content) {
-            onAlertStateChange(Messages.ErrorCode.NoAddContent)
-            return false
-        }
+        // if(!title || !content) {
+        //     onAlertStateChange(Messages.ErrorCode.NoAddContent)
+        //     return false
+        // }
 
-        return await hygallRepository.addContent(new Content.Content(mainList.length,{title : title, content : content})).then((res)=>{
-            onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
-            return res
-        });
+        // return await hygallRepository.addContent(new Content.Content(mainList.length,{title : title, content : content})).then((res)=>{
+        //     onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+        //     return res
+        // });
     }
 
     return(
