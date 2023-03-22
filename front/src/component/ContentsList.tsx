@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress} from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress, Paper} from '@mui/material'
 
 import { List, Length, Color, Write } from '../data';
 import { useHygallContext } from '../context/HygallContext';
@@ -107,6 +107,9 @@ export function ContentsList() {
           </TableRow>
         </TableHead>
         <TableBody>
+          {
+            filteredMainList ? <Box sx={{height : Length.MiddlePaperSize, width:'100%'}}>등록된 게시글이 없습니다</Box> : <span />
+          }
           {(
               rowsPerPage > 0 ?
               filteredMainList.slice(page * rowsPerPage, page*rowsPerPage+rowsPerPage) : filteredMainList
@@ -134,12 +137,14 @@ export function ContentsList() {
         </TableBody>
 
       </Table>
-      <TablePaginationActions 
-        count={filteredMainList.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-      />
+      {filteredMainList.length > 0 ?
+        <TablePaginationActions 
+          count={filteredMainList.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+        /> : <span />
+      } 
     </TableContainer>
 
 

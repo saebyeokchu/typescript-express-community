@@ -12,7 +12,7 @@ app.use(cors());
 
 //connecting to mongodb using mongoose
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/hygall1",{
+mongoose.connect("mongodb://localhost:27017/hygdb",{
     useNewUrlParser:true
 });
 
