@@ -1,11 +1,13 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { Write } from "../data";
+import { AlertColor } from "@mui/material";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { Write, Content, Messages } from "../data";
+import { useAlert } from "../hook/useAlert";
+import { AlertMessage } from "../pages";
 import HygallRepository from "./HygallRepository";
 
 type HygallProviderPros = {
     children : ReactNode
 }
-
 
 type SearchTargetData = {
     contentId : number
@@ -17,6 +19,7 @@ type HygallContext = { //get, change, set
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : SearchTargetData) => void
     setSearchKeyword : (keyword : string) => void
+    addContent : (title : string, content : string) => Promise<boolean>
 
     mainList : Write.MainList[]
     filteredMainList : Write.MainList[]
@@ -41,13 +44,15 @@ export function HygallProvider ({children} : HygallProviderPros){
     const [mainList,setMainList] = useState<Write.MainList[]>([])
     const [filteredMainList, setFilteredMainList] = useState<Write.MainList[]>([])
 
+    const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
+
     useEffect(() => {
         if(mainList.length > 0) {
             filterMainList()
         }
     },[mainList, searchKeyword, listBreakPoint])
 
-    function getMainList() {
+    const getMainList = () => {
         //refresh 할때만 불러오면 좋겠다
         const response :Promise<Number | Write.MainList[]> = hygallRepository.getAllMainList();
         response.then((e) => {
@@ -71,20 +76,44 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     }
 
+    async function addContent(title : string | undefined, content : string | undefined){
+
+        // console.log("title", title)
+        // console.log("content", content)
+        
+        //둘중 하나라도 값이 없으면 리턴
+        // block at 0321 for image import
+         if(typeof(onAlertStateChange) !== "function"){
+            return false
+         }
+
+        if(!title || !content) {
+            onAlertStateChange(Messages.ErrorCode.NoAddContent)
+            return false
+        }
+
+        return await hygallRepository.addContent(new Content.Content(mainList.length,{title : title, content : content})).then((res)=>{
+            onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+            return res
+        });
+    }
+
     return(
         <HygallContext.Provider value={{
             appendSearchTargetData,
             getMainList,
             setListBreakPoint,
             setSearchKeyword,
+            addContent,
             mainList,
             filteredMainList,
             listBreakPoint,
             searchKeyword,
-            searchTargetData
+            searchTargetData,
 
         }}>
             {children}
+            <AlertMessage show={showAlertMessage as boolean} alertState={alertState as AlertColor} alertMessage={alertMessage as string}/>
         </HygallContext.Provider>
     )
 }
