@@ -23,7 +23,7 @@ app.use(express.static('public'));
 
 //connecting to mongodb using mongoose
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/hygall1",{
+mongoose.connect("mongodb://localhost:27017/hygdb",{
     useNewUrlParser:true
 });
 
@@ -59,6 +59,9 @@ app.post("/add", function(req, res){
     addContent(reqBody).then(function(response){
         res.send(response)
     }) 
+})
+app.post('/upload', function(req, res){
+    console.log(req.file)
 })
 
 //upload image

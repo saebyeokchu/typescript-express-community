@@ -138,12 +138,14 @@ export function ContentsList() {
         </TableBody>
 
       </Table>
-      <TablePaginationActions 
-        count={filteredMainList.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-      />
+      {filteredMainList.length > 0 ?
+        <TablePaginationActions 
+          count={filteredMainList.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+        /> : <span />
+      } 
     </TableContainer>
 
 
