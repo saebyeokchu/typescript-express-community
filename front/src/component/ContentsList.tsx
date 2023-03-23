@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress} from '@mui/material'
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress, Chip} from '@mui/material'
 
 import { List, Length, Color, Write } from '../data';
 import { useHygallContext } from '../context/HygallContext';
@@ -98,14 +98,14 @@ export function ContentsList() {
     <>
     <TableContainer sx={{ backgroundColor : "#FFF" }}>
       <Table aria-label="main-table">
-        <TableHead sx={{ backgroundColor : Color.Code.darkBlue}} >
+        {/* <TableHead sx={{ backgroundColor : Color.Code.darkBlue}} >
           <TableRow>
             <TableCell></TableCell>
             <TableCell align="center" sx={{color:'white'}}>제목</TableCell>
             <TableCell align="center" sx={{color:'white'}} >조회수</TableCell>
             <TableCell align="center" sx={{color:'white'}}>등록일</TableCell>
           </TableRow>
-        </TableHead>
+        </TableHead> */}
         <TableBody>
           {(
               rowsPerPage > 0 ?
@@ -114,11 +114,15 @@ export function ContentsList() {
                 <TableRow
                   key={`main-write-${page * rowsPerPage + index + 1}`}
                   sx={{'&:last-child td, &:last-child th': { border: 0 }}}
+                  className="to-cursor-pointer"
                 >
                   <TableCell component="th" scope="row">
                     {page * rowsPerPage + index + 1 }
                   </TableCell>
-                  <TableCell align="center">{row.title}</TableCell>
+                  <TableCell align="center">
+                    {row.title}
+                    <Chip sx={{ml:1}} label={row.commentCount} size="small"  color="primary"/>
+                  </TableCell>
                   <TableCell align="center">{row.viewCount}</TableCell>
                   <TableCell align="center">{row.createdAt}</TableCell>
                 </TableRow>
@@ -134,12 +138,14 @@ export function ContentsList() {
         </TableBody>
 
       </Table>
-      <TablePaginationActions 
-        count={filteredMainList.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-      />
+      {filteredMainList.length > 0 ?
+        <TablePaginationActions 
+          count={filteredMainList.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+        /> : <span />
+      } 
     </TableContainer>
 
 

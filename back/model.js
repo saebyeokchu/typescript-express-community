@@ -2,10 +2,22 @@ const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-let contents = new Schema({
-    _id : {
-        type: ObjectId
+let Comment = new Schema({
+    id : {
+        type : Number
     },
+    content : {
+        type : String
+    },
+    createdAt : {
+        type : String
+    }
+})
+
+let contents = new Schema({
+    // _id : {
+    //     type: ObjectId
+    // },
     contentId : {
         type : Number
     },
@@ -24,17 +36,13 @@ let contents = new Schema({
     createdAt : {
         type : String
     },
-    comments : {
-        id : {
-            type : Number
-        },
-        content : {
-            type : String
-        },
-        createdAt : {
-            type : String
-        }
-    }
+    unlockCode : {
+        type : String
+    },
+    comments : [Comment]
+},{
+    collection:'contents',
+    versionKey: false //here
 });
 
 module.exports = mongoose.model("contents", contents);

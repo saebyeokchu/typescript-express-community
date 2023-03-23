@@ -1,15 +1,17 @@
 import {BrowserRouter, Route, Routes} from "react-router-dom"
-import { Container, Chip } from "@mui/material"
+import { Container, Chip, Box, Alert } from "@mui/material"
 import { HygallProvider } from "./context/HygallContext"
 
 import {
   Main,
   Detail,
   NavBar,
-  New
+  New,
+  AlertMessage
 } from './pages'
 
 function App(){
+  
   return (
     <HygallProvider>
       <Container>

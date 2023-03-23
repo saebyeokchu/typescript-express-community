@@ -1,22 +1,32 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { Write } from "../data";
+import { AlertColor } from "@mui/material";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { Write, Content, Messages } from "../data";
+import { useAlert } from "../hook/useAlert";
+import { AlertMessage } from "../pages";
 import HygallRepository from "./HygallRepository";
 
 type HygallProviderPros = {
     children : ReactNode
 }
 
-
 type SearchTargetData = {
     contentId : number
     title : string
-  }
+}
+
+type uploadResponse = {
+    fileName : string
+    message : string
+}
+
 
 type HygallContext = { //get, change, set
     getMainList : () => void
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : SearchTargetData) => void
     setSearchKeyword : (keyword : string) => void
+    addContent : (title : string, content : string, unlockCode : string) => Promise<boolean>
+    uploadImage : (formData : FormData) => Promise<string | undefined>
 
     mainList : Write.MainList[]
     filteredMainList : Write.MainList[]
@@ -26,6 +36,8 @@ type HygallContext = { //get, change, set
 }
 
 const HygallContext = createContext({} as HygallContext)
+
+const api = 'http://127.0.0.1:4000';
 
 export function useHygallContext(){
     return useContext(HygallContext)
@@ -41,17 +53,19 @@ export function HygallProvider ({children} : HygallProviderPros){
     const [mainList,setMainList] = useState<Write.MainList[]>([])
     const [filteredMainList, setFilteredMainList] = useState<Write.MainList[]>([])
 
+    const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
+
     useEffect(() => {
         if(mainList.length > 0) {
             filterMainList()
         }
     },[mainList, searchKeyword, listBreakPoint])
 
-    function getMainList() {
+    const getMainList = () => {
         //refresh 할때만 불러오면 좋겠다
-        const response :Promise<Number | Write.MainList[]> = hygallRepository.getAllMainList();
+        const response :Promise<boolean | Write.MainList[]> = hygallRepository.getAllMainList();
         response.then((e) => {
-            if(typeof e === "number"){
+            if(typeof e === "boolean"){
                 console.log("no data")
             }else{
                 setMainList( e as Write.MainList[]) //다른거 들어올 일 없음)
@@ -71,20 +85,54 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     }
 
+    //save image to express server
+    const uploadImage = async (formData : FormData) => {
+        return await hygallRepository.uploadImage(formData).then(response => {
+            if(typeof(response) === "object"){
+                return `${api}/${(response as uploadResponse).fileName}`
+            }
+        }).catch(() => onAlertStateChange(Messages.ErrorCode.ImageUploadFail))
+    }
+
+    const addContent = async (title : string, content : string, unlockCode : string) => {
+
+         if(typeof(onAlertStateChange) !== "function"){ 
+            return false
+         }
+
+        if(unlockCode.length < 4){
+            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
+            return false
+        }
+
+        if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
+            onAlertStateChange(Messages.ErrorCode.NoAddContent)
+            return false
+        }
+
+        return await hygallRepository.addContent(new Content.Content(mainList.length,{title, content, unlockCode})).then((res)=>{
+            onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+            return res
+        });
+    }
+
     return(
         <HygallContext.Provider value={{
             appendSearchTargetData,
             getMainList,
             setListBreakPoint,
             setSearchKeyword,
+            addContent,
+            uploadImage,
             mainList,
             filteredMainList,
             listBreakPoint,
             searchKeyword,
-            searchTargetData
+            searchTargetData,
 
         }}>
             {children}
+            <AlertMessage show={showAlertMessage as boolean} alertState={alertState as AlertColor} alertMessage={alertMessage as string}/>
         </HygallContext.Provider>
     )
 }
