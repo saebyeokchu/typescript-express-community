@@ -7,7 +7,9 @@ const ErrorCode = {
     "Unkwoun" : "-1",
     "Success" : "0",
     "NoAddContent" : "100",
-    "AddFail" : "101"
+    "AddFail" : "101",
+    "ShortLockCode" : "102",
+    "ImageUploadFail" : "200"
 }
 
 const AlertMessages : Map = {
@@ -15,7 +17,11 @@ const AlertMessages : Map = {
 
     //adding feature -> starts with 1
     "100" : "내용을 입력해주세요",
-    "101" : "저장에 실패하였어요. 다시 시도해주세요"
+    "101" : "저장에 실패하였어요. 다시 시도해주세요",
+    "102" : "비밀번호는 4글자 이상이여야 해요",
+
+    //image
+    "200" : "이미지 저장에 실패했어요! 잠시후 시도해주세요"
 }
 
 export {

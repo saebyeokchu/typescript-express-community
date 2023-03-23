@@ -14,15 +14,20 @@ export function useAlert(){
 
         setShowAlertMessage(true)
 
-        console.log(e === ErrorCode.Success)
-        console.log(e === ErrorCode.NoAddContent)
-
         switch(e){
             case ErrorCode.Success : {
                 color = "success"
                 break;
             }
             case ErrorCode.NoAddContent : {
+                color = "error"
+                break;
+            }
+            case ErrorCode.ShortLockCode : {
+                color = "error"
+                break;
+            }
+            case ErrorCode.ImageUploadFail : {
                 color = "error"
                 break;
             }

@@ -40,14 +40,13 @@ class Content{
     viewCount : number = 0
     createdAt : string = ""
     comments : Comment[] = []
+    unlockCode : string = ""
 
     public constructor(contentLength : number, init? : Partial<Content>){
         Object.assign(this, init)
 
-        //날짜 설정하기
-        console.log(contentLength)
         this.contentId = contentLength + 1 //나중에 자동 increase 시키면 좋겠다
-        this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")
+        this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")//날짜 설정하기
     }
 }
 

@@ -6,13 +6,9 @@ const tempApiUrl = 'http://127.0.0.1:4000';
 
 export default class HygallRepository implements HygallRepositoryInterface{
 
-    async getAllMainList() : Promise<Number | Write.MainList[]>{
+    async getAllMainList() : Promise<boolean | Write.MainList[]>{
         return await axios.get(`${tempApiUrl}/get`).then(response => {
-            if(response.status === 200){
-                return response.data;
-            }else{
-                return response.status;
-            }
+            return response.status === 200 ? response.data : false
         });
     }
 
@@ -20,5 +16,11 @@ export default class HygallRepository implements HygallRepositoryInterface{
         return await axios.post(`${tempApiUrl}/add`,newContent).then(response => {
             return response.status === 200
         });
+    }
+
+    async uploadImage(formData : FormData) : Promise<boolean | object>{
+        return await fetch(`${tempApiUrl}/upload`, {method:'POST',body : formData}).then(response => {
+            return response.status === 200 ? response.json() : false
+        })
     }
 }

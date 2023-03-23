@@ -7,15 +7,17 @@ import { useHygallContext } from "../context/HygallContext";
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import '../css/canvas.scss'
+
 
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
 export function Canvas(){
     const navigate = useNavigate();
-    const {addContent} = useHygallContext()
+    const {addContent, uploadImage} = useHygallContext()
 
-    const titleRef = useRef<string>()
+    const titleRef = useRef<any>()
     let contentRef = useRef<any>()
-    const pwRef = useRef<number>()
+    const pwRef = useRef<any>()
 
     const imageHandler = () =>{
         const input = document.createElement('input')
@@ -29,10 +31,20 @@ export function Canvas(){
             const formData = new FormData()
 
             const quillObj = contentRef.current.getEditor()
-            const range = quillObj.getSelection()
+            const range = quillObj.getSelection(true)
             
-            console.log(quillObj)
-            console.log(range)
+            if(file){ //if file uploaded
+                formData.append('file',file)
+                formData.append('resource_type','raw')
+
+                //save image to express server
+                await uploadImage(formData).then(response => {
+                    if(response){
+                        quillObj.editor.insertEmbed(range.index, 'image',response)
+                        quillObj.setSelection(range.index + 1)
+                    }
+                })
+            }
 
         }
     }
@@ -53,15 +65,16 @@ export function Canvas(){
 
 
     const save = () => {
-        if(!titleRef || !contentRef){
+        if(!titleRef || !contentRef || !pwRef){
             return;
         }
 
-        if(!titleRef.current){
-            return;
+        if(!(titleRef.current) || !(pwRef.current)){
+            return; 
         } 
 
-        addContent(titleRef.current.value , contentRef.current.value).then(res => {
+        //본문 place holder문제있음
+        addContent(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
             if(res){
                 navigate(-1)
             }

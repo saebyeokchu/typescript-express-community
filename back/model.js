@@ -36,6 +36,9 @@ let contents = new Schema({
     createdAt : {
         type : String
     },
+    unlockCode : {
+        type : String
+    },
     comments : [Comment]
 },{
     collection:'contents',
