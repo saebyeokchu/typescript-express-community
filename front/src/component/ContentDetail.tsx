@@ -40,7 +40,7 @@ export function ContentDetail(){
                                     ㅇㅇ | {Content.Template.createdAt}
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    조회수 {Content.Template.visitCount} 
+                                    조회수 {Content.Template.viewCount} 
                                 </Typography>
                             </Box>
                         </div>
@@ -57,8 +57,11 @@ export function ContentDetail(){
                     <div style={{backgroundColor:Color.Code.lightGrey, paddingLeft:'2rem', paddingRight:'2rem', paddingTop:'1rem', paddingBottom:'1rem'}}>
                         <Box sx={{ justifyContent: 'flex-end', display: 'flex' }}>
                             <Typography color="text.secondary">
-                                댓글 {Content.Template.readCount}
+                                댓글 {Content.Template.commentCount}
                             </Typography>
+                            <Button className="success">
+                                ♥ 30
+                            </Button>
                         </Box>
                     </div>
                     {/* 댓글 (5줄?) */}

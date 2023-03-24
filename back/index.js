@@ -23,7 +23,7 @@ app.use(express.static('public'));
 
 //connecting to mongodb using mongoose
 const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/hygdb",{
+mongoose.connect("mongodb://localhost:27017/hygall1",{
     useNewUrlParser:true
 });
 

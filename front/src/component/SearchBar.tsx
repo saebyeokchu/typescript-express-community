@@ -14,7 +14,7 @@ export function SearchBar(){
             <Paper component="form"  sx={{ p: '2px 4px', display: 'flex', width: 250 }}>
                 <InputBase
                     sx={{ ml: 1, flex: 1 }}
-                    placeholder="검색"
+                    placeholder="제목, 내용 등을 검색해보세요"
                     inputProps={{ 'aria-label': 'search' }}
                     inputRef={ref}//ref사용
                     defaultValue={ref.current}

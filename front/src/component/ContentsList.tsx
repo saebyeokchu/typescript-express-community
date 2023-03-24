@@ -98,14 +98,6 @@ export function ContentsList() {
     <>
     <TableContainer sx={{ backgroundColor : "#FFF" }}>
       <Table aria-label="main-table">
-        {/* <TableHead sx={{ backgroundColor : Color.Code.darkBlue}} >
-          <TableRow>
-            <TableCell></TableCell>
-            <TableCell align="center" sx={{color:'white'}}>제목</TableCell>
-            <TableCell align="center" sx={{color:'white'}} >조회수</TableCell>
-            <TableCell align="center" sx={{color:'white'}}>등록일</TableCell>
-          </TableRow>
-        </TableHead> */}
         <TableBody>
           {(
               rowsPerPage > 0 ?
