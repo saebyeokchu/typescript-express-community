@@ -18,7 +18,7 @@ function App(){
         <NavBar />
         <Routes>
           <Route path="/" element={<Main />} />
-          <Route path="/detail" element={<Detail />} />
+          <Route path="/detail/:contentId" element={<Detail />} />
           <Route path="/new" element={<New />} />
         </Routes>
       </Container>

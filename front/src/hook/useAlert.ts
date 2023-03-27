@@ -15,7 +15,10 @@ export function useAlert(){
         setShowAlertMessage(true)
 
         switch(e){
-            case ErrorCode.Success : {
+            case ErrorCode.Unkwoun : {
+                color = "error"
+                break;
+            }case ErrorCode.Success : {
                 color = "success"
                 break;
             }

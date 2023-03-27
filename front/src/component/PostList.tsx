@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress, Chip} from '@mui/material'
 
-import { List, Length, Color, Write } from '../data';
 import { useHygallContext } from '../context/HygallContext';
+import { Messages } from '../data';
 
 
 interface TablePaginationActionsProps {
@@ -55,7 +55,7 @@ function TablePaginationActions(props : TablePaginationActionsProps){
 }
 
 
-export function ContentsList() {
+export function PostList() {
   const navigate = useNavigate();
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -94,6 +94,14 @@ export function ContentsList() {
   }
   // console.log("ContentsList : ", filteredMainList, searchTargetData)
 
+  const moveToDetail = (contentId : number | undefined) => {
+    if(contentId === undefined){
+      onAlertStateChange(Messages.ErrorCode.Unkwoun)
+    }else{
+      navigate(`/detail/${contentId}`)
+    }
+  }
+
   return (
     <>
     <TableContainer sx={{ backgroundColor : "#FFF" }}>
@@ -104,12 +112,13 @@ export function ContentsList() {
               filteredMainList.slice(page * rowsPerPage, page*rowsPerPage+rowsPerPage) : filteredMainList
             ).map((row, index) => (
                 <TableRow
-                  key={`main-write-${page * rowsPerPage + index + 1}`}
+                  key={`main-post-list-${row.contentId}`}
                   sx={{'&:last-child td, &:last-child th': { border: 0 }}}
                   className="to-cursor-pointer"
+                  onClick={ () => moveToDetail(row.contentId) }
                 >
                   <TableCell component="th" scope="row">
-                    {page * rowsPerPage + index + 1 }
+                    {row.contentId}
                   </TableCell>
                   <TableCell align="center">
                     {row.title}

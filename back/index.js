@@ -1,10 +1,14 @@
-async function get(){    
+async function getList(){    
     //view version for main list
     return await contents.find({}, {comments : 0, content : 0}).sort({contentId : -1});
     // db.contents.find({contentId : {$gte : 1, $lt : 3}})
 }
 
-function addContent(newContent){
+async function get(contentId){
+    return await contents.find({contentId}, {_id : 0, unlockCode : 0})
+}
+
+function addPost(newContent){
     return contents.insertMany([newContent]);
 }
 
@@ -42,11 +46,18 @@ app.use("/",router);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//get main list
-router.route("/get").get(function(req, res){
-    get().then(function(items){
+//get post list
+router.route("/getList").get(function(req, res){
+    getList().then(function(items){
         res.send(items)
     })
+})
+
+//get post
+router.route("/get/:contentId").get(function(req, res){
+    get(req.params.contentId).then(function(item){
+        res.send(item)
+    });
 })
 
 //add new content
@@ -56,13 +67,17 @@ app.post("/add", function(req, res){
 
     console.log(reqBody)
     
-    addContent(reqBody).then(function(response){
+    addPost(reqBody).then(function(response){
         res.send(response)
     }) 
 })
-app.post('/upload', function(req, res){
-    console.log(req.file)
+
+router.route("/delete/:contentId").get(function(req,res){
+    deletePost(req.params.contentId).then(function(item){
+        res.send(item)
+    });
 })
+
 
 //upload image
 app.post("/upload",async function(req, res){

@@ -2,11 +2,11 @@ import { Box, Typography, Alert } from '@mui/material'
 import { Link } from 'react-router-dom'
 
 import { ListBreakPointButton } from '../component'
-import { Color } from '../data'
+import { Constant } from '../data'
 
 export function NavBar(){
     return(
-        <Box sx={{justifyContent:'flex-start', backgroundColor:Color.Code.darkBlue}}>
+        <Box sx={{justifyContent:'flex-start', backgroundColor:Constant.ColorCode.darkBlue}}>
             <Box sx={{textAlign:'right',pt:'1rem',pr:'1rem',pb:'0.5rem'}}>
                 <Link to="/" className='no-underline'>
                     <Typography variant="h5" component="h5" className="tw">

@@ -13,6 +13,7 @@ const ErrorCode = {
 }
 
 const AlertMessages : Map = {
+    "-1" : "알 수 없는 오류가 발생되었습니다",
     "0" : "성공적으로 처리되었습니다",
 
     //adding feature -> starts with 1

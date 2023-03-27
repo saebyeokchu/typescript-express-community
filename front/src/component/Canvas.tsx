@@ -1,8 +1,8 @@
-import React, { ReactNode, useRef, useState, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Paper, Alert, InputBase, Box, Button, TextField, inputAdornmentClasses } from "@mui/material"
+import React, { useRef, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { Paper, InputBase, Box, Button } from "@mui/material"
 
-import { Length, Color, Messages } from "../data"
+import { Constant } from "../data"
 import { useHygallContext } from "../context/HygallContext";
 
 import ReactQuill from 'react-quill';
@@ -13,7 +13,7 @@ import '../css/canvas.scss'
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
 export function Canvas(){
     const navigate = useNavigate();
-    const {addContent, uploadImage} = useHygallContext()
+    const {addPost, uploadImage} = useHygallContext()
 
     const titleRef = useRef<any>()
     let contentRef = useRef<any>()
@@ -74,7 +74,7 @@ export function Canvas(){
         } 
 
         //본문 place holder문제있음
-        addContent(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
+        addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
             if(res){
                 navigate(-1)
             }
@@ -84,7 +84,7 @@ export function Canvas(){
 
     return(
         <>
-            <Paper sx={{height:Length.MiddlePaperSize}}>
+            <Paper sx={{height:Constant.MiddlePaperSize}}>
                 <InputBase 
                     fullWidth
                     sx={{ height : '3.5rem', p : 2}}
@@ -96,7 +96,7 @@ export function Canvas(){
                     placeholder="본문"
                     modules={modules}
                     ref={contentRef}
-                    style={{height : Length.MiddlePaperSize - 150}}/>
+                    style={{height : Constant.MiddlePaperSize - 150}}/>
                 <InputBase //숫자만 accept하기
                     fullWidth
                     sx={{ height : '3.5rem', mt : 5, p : 2}}
@@ -106,7 +106,7 @@ export function Canvas(){
                     type="password"
                 />
             </Paper>
-            <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.Code.darkBlue}}>
+            <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Constant.ColorCode.darkBlue}}>
                 {/* 링크 연결 나중에 */}
                 <Button variant="contained" onClick={() => navigate(-1)}>목록으로</Button> 
                 <Button variant="contained" onClick={() => save()}>저장</Button>

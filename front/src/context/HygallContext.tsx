@@ -1,6 +1,7 @@
 import { AlertColor } from "@mui/material";
+import { AxiosResponse } from "axios";
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
-import { Write, Content, Messages } from "../data";
+import { Messages, Post } from "../data";
 import { useAlert } from "../hook/useAlert";
 import { AlertMessage } from "../pages";
 import HygallRepository from "./HygallRepository";
@@ -21,15 +22,19 @@ type uploadResponse = {
 
 
 type HygallContext = { //get, change, set
-    getMainList : () => void
+    getPostList : () => void
+    getPost : (contentId : number) => void
+    addPost : (title : string, content : string, unlockCode : string) => Promise<boolean>
+    deletePost : () => void
+
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : SearchTargetData) => void
     setSearchKeyword : (keyword : string) => void
-    addContent : (title : string, content : string, unlockCode : string) => Promise<boolean>
     uploadImage : (formData : FormData) => Promise<string | undefined>
 
-    mainList : Write.MainList[]
-    filteredMainList : Write.MainList[]
+    mainList : Post.PostList[]
+    post : Post.Post
+    filteredMainList : Post.PostList[]
     listBreakPoint : number
     searchKeyword : string
     searchTargetData : SearchTargetData[]
@@ -47,11 +52,14 @@ export function useHygallContext(){
 //전부 지금은 state로 관리해도 문제 없을듯
 export function HygallProvider ({children} : HygallProviderPros){
     const hygallRepository = new HygallRepository();
+
+    const [mainList,setMainList] = useState<Post.PostList[]>([])
+    const [post,setPost] = useState<Post.Post>(new Post.Post(-1,{}))
+
     const [listBreakPoint, setListBreakPoint] = useState<number>(-1)
     const [searchKeyword, setSearchKeyword] = useState<string>("")
     const [searchTargetData, setSearchTargetData] = useState<SearchTargetData[]>([])
-    const [mainList,setMainList] = useState<Write.MainList[]>([])
-    const [filteredMainList, setFilteredMainList] = useState<Write.MainList[]>([])
+    const [filteredMainList, setFilteredMainList] = useState<Post.PostList[]>([])
 
     const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
 
@@ -61,17 +69,60 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
     },[mainList, searchKeyword, listBreakPoint])
 
-    const getMainList = () => {
+    const getPostList = async () => {
         //refresh 할때만 불러오면 좋겠다
-        const response :Promise<boolean | Write.MainList[]> = hygallRepository.getAllMainList();
-        response.then((e) => {
-            if(typeof e === "boolean"){
-                console.log("no data")
+        await hygallRepository.getPostList().then(response => {
+            if(response.status === 200){
+                setMainList(response.data as Post.PostList[]) //다른거 들어올 일 없음)
             }else{
-                setMainList( e as Write.MainList[]) //다른거 들어올 일 없음)
+                onAlertStateChange(Messages.ErrorCode.Unkwoun)
+            }
+        });
+    }
+
+    const getPost = async (contentId : number) => {
+
+        await hygallRepository.getPost(contentId).then(response => {
+            if(response.status === 200){
+                // console.log("before", post)
+                setPost(response.data[0] as Post.Post)
+                // console.log("after", post)
+            }else{
+                onAlertStateChange(Messages.ErrorCode.Unkwoun)
             }
         })
     }
+
+    const addPost = async (title : string, content : string, unlockCode : string) => {
+
+        if(typeof(onAlertStateChange) !== "function"){ 
+           return false
+        }
+
+       if(unlockCode.length < 4){
+           onAlertStateChange(Messages.ErrorCode.ShortLockCode)
+           return false
+       }
+
+       if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
+           onAlertStateChange(Messages.ErrorCode.NoAddContent)
+           return false
+       }
+
+       return await hygallRepository.addPost(new Post.Post(mainList.length,{title, content, unlockCode})).then((res)=>{
+           onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+           return res
+       });
+   }
+
+   const deletePost = () => {
+    if(post.contentId < 1) {
+        return;
+    }
+
+    hygallRepository.deletePost(post.contentId).then(response => console.log(response))
+
+   }
 
     const appendSearchTargetData = (newSearchData : SearchTargetData) => setSearchTargetData([ ... searchTargetData, newSearchData]) 
 
@@ -94,37 +145,18 @@ export function HygallProvider ({children} : HygallProviderPros){
         }).catch(() => onAlertStateChange(Messages.ErrorCode.ImageUploadFail))
     }
 
-    const addContent = async (title : string, content : string, unlockCode : string) => {
-
-         if(typeof(onAlertStateChange) !== "function"){ 
-            return false
-         }
-
-        if(unlockCode.length < 4){
-            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
-            return false
-        }
-
-        if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
-            onAlertStateChange(Messages.ErrorCode.NoAddContent)
-            return false
-        }
-
-        return await hygallRepository.addContent(new Content.Content(mainList.length,{title, content, unlockCode})).then((res)=>{
-            onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
-            return res
-        });
-    }
-
     return(
         <HygallContext.Provider value={{
-            appendSearchTargetData,
-            getMainList,
+            getPostList,
+            getPost,
+            addPost,
+            deletePost,
             setListBreakPoint,
             setSearchKeyword,
-            addContent,
+            appendSearchTargetData,
             uploadImage,
             mainList,
+            post,
             filteredMainList,
             listBreakPoint,
             searchKeyword,

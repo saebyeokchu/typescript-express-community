@@ -1,13 +1,15 @@
-import { ContentsList } from "./ContentsList"
-import { ContentDetail } from "./ContentDetail"
+import { PostList } from "./PostList"
+import { PostDetail } from "./PostDetail"
 import { SearchBar } from "./SearchBar"
 import { ListBreakPointButton } from "./ListBreakPointButton"
 import { Canvas } from "./Canvas"
+import { MiddleBreak } from "./MiddleBreak"
 
 export { 
-    ContentsList,
+    PostDetail,
+    PostList,
     SearchBar,
     ListBreakPointButton,
-    ContentDetail,
-    Canvas
+    Canvas,
+    MiddleBreak
 }
