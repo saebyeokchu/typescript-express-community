@@ -63,6 +63,7 @@ export function HygallProvider ({children} : HygallProviderPros){
     const [searchTargetData, setSearchTargetData] = useState<SearchTargetData[]>([])
     const [filteredMainList, setFilteredMainList] = useState<Post.PostList[]>([])
 
+    
     const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
 
     useEffect(() => {

@@ -10,16 +10,13 @@ export function Edit(){
     const { post, cleanPost } = useHygallContext()
     let { contentId } = useParams()
 
-    console.log(post)
-
-    
-        useEffect(()=>{
-            if(post === undefined){ 
-                navigate("/")
-            }else if(post.contentId < 1 || !contentId){
-                navigate("/")
-            }
-        },[])
+    useEffect(()=>{
+        if(post === undefined){ 
+            navigate("/")
+        }else if(post.contentId < 1 || !contentId){
+            navigate("/")
+        }
+    },[])
 
     return (
         <Canvas 

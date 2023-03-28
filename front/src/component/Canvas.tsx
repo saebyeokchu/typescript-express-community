@@ -105,10 +105,12 @@ export function Canvas({mode} : CanvasProps){
             if(titleRef.current){
                 titleRef.current.value = post.title
             }
+
+            if(pwRef.current){ 
+                pwRef.current.value = "수정중 입니다"
+            }
         }
-
-
-    },[titleRef])
+    },[titleRef, pwRef])
 
     return(
         <>
@@ -127,24 +129,15 @@ export function Canvas({mode} : CanvasProps){
                     style={{height : Constant.MiddlePaperSize - 150}}
                     value={postAvailable? post.content : ""}
                 />
-                {mode === "new" &&
-                    <InputBase //숫자만 accept하기
+                <InputBase //숫자만 accept하기
                         fullWidth
                         sx={{ height : '3.5rem', mt : 5, p : 2}}
                         placeholder="수정 / 삭제용 비밀번호(4~6자리)"
                         inputRef={pwRef}
                         inputProps={{ maxLength : 6}}
-                        type="password"
-                    /> 
-                }
-                <InputBase //숫자만 accept하기
-                        fullWidth
-                        disabled
-                        sx={{ height : '3.5rem', mt : 5, p : 2}}
-                        value = "수정중입니다"
-                        inputRef={pwRef}
-                        inputProps={{ maxLength : 6}}
-                    /> 
+                        type={postAvailable ? "text" : "password"}
+                        disabled={postAvailable ? true : false}
+                /> 
             </Paper>
             <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Constant.ColorCode.darkBlue}}>
                 {/* 링크 연결 나중에 */}
