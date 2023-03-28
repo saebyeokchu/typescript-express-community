@@ -9,7 +9,8 @@ const ErrorCode = {
     "NoAddContent" : "100",
     "AddFail" : "101",
     "ShortLockCode" : "102",
-    "ImageUploadFail" : "200"
+    "ImageUploadFail" : "200",
+    "DeleteFail" : "300"
 }
 
 const AlertMessages : Map = {
@@ -22,7 +23,10 @@ const AlertMessages : Map = {
     "102" : "비밀번호는 4글자 이상이여야 해요",
 
     //image
-    "200" : "이미지 저장에 실패했어요! 잠시후 시도해주세요"
+    "200" : "이미지 저장에 실패했어요! 잠시후 시도해주세요",
+
+    //delete feature
+    "300" : "포스트 삭제에 실패하였습니다. 잠시 후 시도하여 주세요"
 }
 
 export {

@@ -1,9 +1,10 @@
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { AlertColor } from "@mui/material";
-import { AxiosResponse } from "axios";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+
 import { Messages, Post } from "../data";
+import { AlertMessage, PostDeleteDialog, PostEditDialog, } from "../component";
+
 import { useAlert } from "../hook/useAlert";
-import { AlertMessage } from "../pages";
 import HygallRepository from "./HygallRepository";
 
 type HygallProviderPros = {
@@ -25,12 +26,13 @@ type HygallContext = { //get, change, set
     getPostList : () => void
     getPost : (contentId : number) => void
     addPost : (title : string, content : string, unlockCode : string) => Promise<boolean>
-    deletePost : () => void
+    deletePost : () => Promise<boolean | undefined>
 
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : SearchTargetData) => void
     setSearchKeyword : (keyword : string) => void
     uploadImage : (formData : FormData) => Promise<string | undefined>
+    cleanPost : () => void
 
     mainList : Post.PostList[]
     post : Post.Post
@@ -115,12 +117,24 @@ export function HygallProvider ({children} : HygallProviderPros){
        });
    }
 
-   const deletePost = () => {
+   const deletePost = async () => {
     if(post.contentId < 1) {
         return;
     }
+    
+    return await hygallRepository.deletePost(post.contentId).then(response => {
+        if(response === undefined){
+            return false
+        }
+        
+        if(response){
+            onAlertStateChange(Messages.ErrorCode.Success)
+        }else{
+            onAlertStateChange(Messages.ErrorCode.DeleteFail)
+        }
 
-    hygallRepository.deletePost(post.contentId).then(response => console.log(response))
+        return response
+    })
 
    }
 
@@ -145,6 +159,10 @@ export function HygallProvider ({children} : HygallProviderPros){
         }).catch(() => onAlertStateChange(Messages.ErrorCode.ImageUploadFail))
     }
 
+    const cleanPost = () => {
+        setPost(new Post.Post(-1,{}))
+    }
+
     return(
         <HygallContext.Provider value={{
             getPostList,
@@ -155,6 +173,7 @@ export function HygallProvider ({children} : HygallProviderPros){
             setSearchKeyword,
             appendSearchTargetData,
             uploadImage,
+            cleanPost,
             mainList,
             post,
             filteredMainList,
@@ -164,7 +183,12 @@ export function HygallProvider ({children} : HygallProviderPros){
 
         }}>
             {children}
-            <AlertMessage show={showAlertMessage as boolean} alertState={alertState as AlertColor} alertMessage={alertMessage as string}/>
+            <AlertMessage 
+                show={showAlertMessage as boolean} 
+                alertState={alertState as AlertColor} 
+                alertMessage={alertMessage as string}/>
+            <PostDeleteDialog />
+            <PostEditDialog />
         </HygallContext.Provider>
     )
 }

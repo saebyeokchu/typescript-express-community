@@ -1,10 +1,10 @@
-async function getList(){    
+async function getPostList(){    
     //view version for main list
     return await contents.find({}, {comments : 0, content : 0}).sort({contentId : -1});
     // db.contents.find({contentId : {$gte : 1, $lt : 3}})
 }
 
-async function get(contentId){
+async function getPost(contentId){
     return await contents.find({contentId}, {_id : 0, unlockCode : 0})
 }
 
@@ -12,10 +12,16 @@ function addPost(newContent){
     return contents.insertMany([newContent]);
 }
 
+function deletePost(contentId){
+    return contents.deleteOne({contentId})
+}
+
 const express = require("express");
 const fileUpload = require("express-fileupload")
 const cors = require("cors");
-const makeUnlockCode = require("./makeUnlockCode.js")
+
+const makeUnlockCode = require("./util/makeUnlockCode.js")
+
 const app = express();
 const PORT = 4000;
 
@@ -46,33 +52,33 @@ app.use("/",router);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 //get post list
-router.route("/getList").get(function(req, res){
-    getList().then(function(items){
+router.route("/getPostList").get(function(req, res){
+    getPostList().then(function(items){
         res.send(items)
     })
 })
 
 //get post
-router.route("/get/:contentId").get(function(req, res){
-    get(req.params.contentId).then(function(item){
+router.route("/getPost/:contentId").get(function(req, res){
+    getPost(req.params.contentId).then(function(item){
         res.send(item)
     });
 })
 
+
 //add new content
-app.post("/add", function(req, res){
+app.post("/addPost", function(req, res){
     const reqBody = req.body;
     reqBody.unlockCode = makeUnlockCode(reqBody.unlockCode)
-
-    console.log(reqBody)
     
     addPost(reqBody).then(function(response){
         res.send(response)
     }) 
 })
 
-router.route("/delete/:contentId").get(function(req,res){
+router.route("/deletePost/:contentId").get(function(req,res){
     deletePost(req.params.contentId).then(function(item){
         res.send(item)
     });
@@ -80,13 +86,13 @@ router.route("/delete/:contentId").get(function(req,res){
 
 
 //upload image
-app.post("/upload",async function(req, res){
+app.post("/uploadImage",async function(req, res){
     const { file } = req.files;
 
     //test if type of image not matched
     if(!/^image/.test(file.mimetype)){
         res.status(400).send('No files were uploaded');
-    }
+    } 
 
     const fileName = moment().format('YYYYMMDDHHMMSS') + "." + file.mimetype.split('/')[1];
 

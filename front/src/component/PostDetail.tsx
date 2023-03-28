@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Card,Box, CardContent, Typography, Paper, InputBase, Button, Chip, Avatar, SnackbarContent, Snackbar, Alert, ButtonGroup } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+
+import { Card,Box, CardContent, Typography, Paper, InputBase, Button, Chip, Snackbar, Alert, ButtonGroup } from "@mui/material";
 
 import { Constant, Post } from "../data";
 import { useHygallContext } from "../context/HygallContext";
-import { MiddleBreak } from "./MiddleBreak";
+import { MiddleBreak } from "./";
 
 type CommentProps = {
     content : string,
@@ -26,12 +28,15 @@ function Comment({content, createdAt} : CommentProps){
 }
 
 export function PostDetail(){
+    const navigate = useNavigate()
     const { post, deletePost } = useHygallContext()
     const [ openDeleteSnackBar, setOpenDeleteSnackBar ] = useState<boolean>(false)
 
-    const onDeleteClicked = () => {
+    const onDeleteClicked = async () => {
         setOpenDeleteSnackBar(false)
-        deletePost()
+        if(await deletePost()){
+            navigate('/')
+        }
     }
 
     return(
@@ -56,21 +61,30 @@ export function PostDetail(){
                         </div>
                     </Box> 
                     {/* 중간 콘텐츠만 고정값 */}
-                    <CardContent sx={{minHeight:'300px'}}>
-                        <Box sx={{pt:2, height:'100%'}}>
-                            <div dangerouslySetInnerHTML={{__html: post.content}} />
-                        </Box>
-                        <Box sx={{display:'flex',gap:'10px',justifyContent:'center'}}>
-                            <Button variant="contained" color="warning" size="small">좋아요 {post.like}</Button>
-                            <Button variant="contained" size="small">수정</Button>
-                            <Button variant="contained" onClick={() => setOpenDeleteSnackBar(true)} size="small">삭제</Button>
+                    <CardContent>
+                        <Box sx={{position:'relative', minHeight:'300px'}}>
+                            <Box sx={{pt:2, width:'100%',pb:5}}>
+                                <div dangerouslySetInnerHTML={{__html: post.content}} />
+                            </Box>
+                            <Box sx={{
+                                position:'absolute',
+                                bottom:'2px',
+                                display:'flex',
+                                justifyContent:'center',
+                                width:'100%',
+                                gap:'10px'}}>
+                                <Button variant="contained" color="warning" size="small">좋아요 {post.like}</Button>
+                                <Button variant="contained" size="small" onClick={()=>navigate(`/edit/${post.contentId}`)}>수정</Button>
+                                <Button variant="contained" onClick={() => setOpenDeleteSnackBar(true)} size="small">삭제</Button>
+                            </Box>
                         </Box>
                     </CardContent>
                     {/* 댓글 알림창 */}
                     <Box 
                         sx={{
                             backgroundColor:Constant.ColorCode.lightGrey, 
-                            p:1}}>
+                            p:1
+                        }}>
                         <Box sx={{display:'flex', justifyContent:'space-between'}}>
                             <Box sx={{ gap:'10px', justifyContent: 'flex-end', display: 'flex' }}>
                                 <Chip
@@ -79,7 +93,7 @@ export function PostDetail(){
                                 />
                             </Box>
                             <Box sx={{ display:'flex', flexDirection:'row', gap:'10px'}}>
-                                <Paper component="form"  sx={{ width: 500}}>
+                                <Paper component="form"  sx={{ width: '80%'}}>
                                     <InputBase
                                         sx={{ ml: 1 }}
                                         placeholder="댓글(최대 200자)"
@@ -128,7 +142,6 @@ export function PostDetail(){
                             return <Comment key={`post-detail-comment-${index}`} content={e.content} createdAt={e.createdAt}/>
                         })}
                     </div>
-                    
                     <MiddleBreak />
                 </React.Fragment>
             </Card>

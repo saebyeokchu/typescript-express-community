@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Paper, InputBase, Box, Button } from "@mui/material"
 
@@ -8,16 +8,26 @@ import { useHygallContext } from "../context/HygallContext";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import '../css/canvas.scss'
+import { Loading } from "./";
 
+type CanvasProps = {
+    mode : string | undefined
+}
 
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
-export function Canvas(){
+export function Canvas({mode} : CanvasProps){
     const navigate = useNavigate();
-    const {addPost, uploadImage} = useHygallContext()
+    const {addPost, uploadImage, post, cleanPost} = useHygallContext()
 
     const titleRef = useRef<any>()
     let contentRef = useRef<any>()
     const pwRef = useRef<any>()
+
+    const postAvailable = post.contentId > 0;
+
+    if(mode===undefined || mode === "") {
+        return <Loading />
+    }
 
     const imageHandler = () =>{
         const input = document.createElement('input')
@@ -63,7 +73,6 @@ export function Canvas(){
         }
     },[])
 
-
     const save = () => {
         if(!titleRef || !contentRef || !pwRef){
             return;
@@ -81,6 +90,25 @@ export function Canvas(){
         })
     }
 
+    const moveToPostList = () => {
+        //post값 초기화
+        cleanPost()
+
+        //메인으로 이동
+        navigate("/")
+
+        //history 있으면 clear
+    }
+
+    useEffect(() => {
+        if(postAvailable){
+            if(titleRef.current){
+                titleRef.current.value = post.title
+            }
+        }
+
+
+    },[titleRef])
 
     return(
         <>
@@ -96,19 +124,31 @@ export function Canvas(){
                     placeholder="본문"
                     modules={modules}
                     ref={contentRef}
-                    style={{height : Constant.MiddlePaperSize - 150}}/>
-                <InputBase //숫자만 accept하기
-                    fullWidth
-                    sx={{ height : '3.5rem', mt : 5, p : 2}}
-                    placeholder="수정 / 삭제용 비밀번호(4~6자리)"
-                    inputRef={pwRef}
-                    inputProps={{ maxLength : 6}}
-                    type="password"
+                    style={{height : Constant.MiddlePaperSize - 150}}
+                    value={postAvailable? post.content : ""}
                 />
+                {mode === "new" &&
+                    <InputBase //숫자만 accept하기
+                        fullWidth
+                        sx={{ height : '3.5rem', mt : 5, p : 2}}
+                        placeholder="수정 / 삭제용 비밀번호(4~6자리)"
+                        inputRef={pwRef}
+                        inputProps={{ maxLength : 6}}
+                        type="password"
+                    /> 
+                }
+                <InputBase //숫자만 accept하기
+                        fullWidth
+                        disabled
+                        sx={{ height : '3.5rem', mt : 5, p : 2}}
+                        value = "수정중입니다"
+                        inputRef={pwRef}
+                        inputProps={{ maxLength : 6}}
+                    /> 
             </Paper>
             <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Constant.ColorCode.darkBlue}}>
                 {/* 링크 연결 나중에 */}
-                <Button variant="contained" onClick={() => navigate(-1)}>목록으로</Button> 
+                <Button variant="contained" onClick={moveToPostList}>목록으로</Button> 
                 <Button variant="contained" onClick={() => save()}>저장</Button>
             </Box>
         </>

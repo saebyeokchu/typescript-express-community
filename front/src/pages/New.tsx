@@ -2,6 +2,8 @@ import { Canvas } from "../component"
 
 export function New(){
     return(
-        <Canvas />
+        <Canvas 
+            mode="new"
+        />
     )
 }

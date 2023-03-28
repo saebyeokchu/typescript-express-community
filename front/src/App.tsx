@@ -7,7 +7,7 @@ import {
   Detail,
   NavBar,
   New,
-  AlertMessage
+  Edit
 } from './pages'
 
 function App(){
@@ -20,6 +20,7 @@ function App(){
           <Route path="/" element={<Main />} />
           <Route path="/detail/:contentId" element={<Detail />} />
           <Route path="/new" element={<New />} />
+          <Route path="/edit/:contentId" element={<Edit />} />
         </Routes>
       </Container>
     </HygallProvider>
