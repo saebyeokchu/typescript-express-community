@@ -29,9 +29,13 @@ function Comment({content, createdAt} : CommentProps){
 
 export function PostDetail(){
     const navigate = useNavigate()
-    const { post, deletePost } = useHygallContext()
+    const { post, deletePost, editPost, openPostEditDialog } = useHygallContext()
     const [ openDeleteSnackBar, setOpenDeleteSnackBar ] = useState<boolean>(false)
 
+    const onEditClicked = () => {
+        openPostEditDialog()
+       // navigate(`/edit/${post.contentId}`)
+    }
     const onDeleteClicked = async () => {
         setOpenDeleteSnackBar(false)
         if(await deletePost()){
@@ -74,7 +78,7 @@ export function PostDetail(){
                                 width:'100%',
                                 gap:'10px'}}>
                                 <Button variant="contained" color="warning" size="small">좋아요 {post.like}</Button>
-                                <Button variant="contained" size="small" onClick={()=>navigate(`/edit/${post.contentId}`)}>수정</Button>
+                                <Button variant="contained" size="small" onClick={onEditClicked}>수정</Button>
                                 <Button variant="contained" onClick={() => setOpenDeleteSnackBar(true)} size="small">삭제</Button>
                             </Box>
                         </Box>

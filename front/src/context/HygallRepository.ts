@@ -21,7 +21,15 @@ export default class HygallRepository implements HygallRepositoryInterface{
     async addPost(newPost : Post.Post) : Promise<boolean> { //async 필요없음
         return await axios.post(`${tempApiUrl}/addPost`,newPost).then(response => {
             return response.status === 200
-        });
+        })
+    }
+
+    async editPost(contentId : number, title : string, content : string, ) : Promise<boolean> { //async 필요없음
+        console.log(contentId, title, content)
+
+        return await axios.post(`${tempApiUrl}/editPost`,{contentId, title, content}).then(response => {
+            return response.status === 200
+        })
     }
 
     async deletePost(contentId : number) : Promise<boolean>{
@@ -33,6 +41,12 @@ export default class HygallRepository implements HygallRepositoryInterface{
     async uploadImage(formData : FormData) : Promise<boolean | object>{
         return await fetch(`${tempApiUrl}/uploadImage`, {method:'POST',body : formData}).then(response => {
             return response.status === 200 ? response.json() : false
+        })
+    }
+
+    async checkUnlockCode(contentId:number,inputUnlockCode:string) : Promise<boolean>{
+        return await axios.post(`${tempApiUrl}/checkUnlockCode`,{contentId, inputUnlockCode}).then(response => {
+            return response.status===200 ? response.data : false
         })
     }
 }

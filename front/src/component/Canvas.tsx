@@ -17,7 +17,7 @@ type CanvasProps = {
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
 export function Canvas({mode} : CanvasProps){
     const navigate = useNavigate();
-    const {addPost, uploadImage, post, cleanPost} = useHygallContext()
+    const {addPost, uploadImage, post, cleanPost, editPost} = useHygallContext()
 
     const titleRef = useRef<any>()
     let contentRef = useRef<any>()
@@ -83,11 +83,21 @@ export function Canvas({mode} : CanvasProps){
         } 
 
         //본문 place holder문제있음
-        addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
-            if(res){
-                navigate(-1)
-            }
-        })
+
+        if(mode === "new"){
+            addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
+                if(res){
+                    navigate(-1)
+                }
+            })
+        }else{
+            editPost(titleRef.current.value , contentRef.current.value).then(res => {
+                if(res){
+                    navigate(`/detail/${post.contentId}`)
+                }
+            })
+        }
+        
     }
 
     const moveToPostList = () => {

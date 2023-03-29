@@ -10,7 +10,8 @@ const ErrorCode = {
     "AddFail" : "101",
     "ShortLockCode" : "102",
     "ImageUploadFail" : "200",
-    "DeleteFail" : "300"
+    "DeleteFail" : "300",
+    "UnmatchedUnlockCode" : "400"
 }
 
 const AlertMessages : Map = {
@@ -26,7 +27,10 @@ const AlertMessages : Map = {
     "200" : "이미지 저장에 실패했어요! 잠시후 시도해주세요",
 
     //delete feature
-    "300" : "포스트 삭제에 실패하였습니다. 잠시 후 시도하여 주세요"
+    "300" : "포스트 삭제에 실패하였습니다. 잠시 후 시도하여 주세요",
+
+    //edit feature
+    "400" : "수정 / 삭제용 비밀번호가 일치하지 않습니다"
 }
 
 export {

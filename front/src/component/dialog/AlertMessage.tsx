@@ -1,7 +1,7 @@
 import { Box, Alert, AlertColor, Snackbar } from "@mui/material"
 
 type AlertMessageProps = {
-    show : boolean
+    show :  boolean
     alertState : AlertColor
     alertMessage : string
 }
