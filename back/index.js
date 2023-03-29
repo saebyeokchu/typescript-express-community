@@ -8,8 +8,16 @@ async function getPost(contentId){
     return await contents.find({contentId}, {_id : 0, unlockCode : 0})
 }
 
+async function getPostUnlockCode(contentId){
+    return await contents.find({contentId},{unlockCode:1})
+}
+
 function addPost(newContent){
     return contents.insertMany([newContent]);
+}
+
+function editPost(contentId, title, content){
+    return contents.updateOne({contentId},{$set : {title, content}})
 }
 
 function deletePost(contentId){
@@ -20,7 +28,7 @@ const express = require("express");
 const fileUpload = require("express-fileupload")
 const cors = require("cors");
 
-const makeUnlockCode = require("./util/makeUnlockCode.js")
+const { getUnlockCode, checkUnlockCode } = require("./util/unlockCode.js")
 
 const app = express();
 const PORT = 4000;
@@ -71,9 +79,18 @@ router.route("/getPost/:contentId").get(function(req, res){
 //add new content
 app.post("/addPost", function(req, res){
     const reqBody = req.body;
-    reqBody.unlockCode = makeUnlockCode(reqBody.unlockCode)
+    reqBody.unlockCode = getUnlockCode(reqBody.unlockCode)
     
     addPost(reqBody).then(function(response){
+        res.send(response)
+    }) 
+})
+
+//edit content
+app.post("/editPost", function(req, res){
+    const reqBody = req.body;
+    
+    editPost(reqBody.contentId, reqBody.title, reqBody.content).then(function(response){
         res.send(response)
     }) 
 })
@@ -103,6 +120,16 @@ app.post("/uploadImage",async function(req, res){
     });
 
     res.status(200).send({fileName,meesage : 'File is successfully uploaded'}); //all good
+})
+
+//unlock code
+app.post("/checkUnlockCode", async function(req, res){
+    const reqBody = req.body;
+    
+    const targetPost = await getPostUnlockCode(reqBody.contentId);
+    const checkResult = checkUnlockCode(reqBody.inputUnlockCode, targetPost[0].unlockCode);
+
+    res.send(checkResult)
 })
 
 app.listen(PORT, function() {

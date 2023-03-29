@@ -17,7 +17,7 @@ type CanvasProps = {
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
 export function Canvas({mode} : CanvasProps){
     const navigate = useNavigate();
-    const {addPost, uploadImage, post, cleanPost} = useHygallContext()
+    const {addPost, uploadImage, post, cleanPost, editPost} = useHygallContext()
 
     const titleRef = useRef<any>()
     let contentRef = useRef<any>()
@@ -83,11 +83,21 @@ export function Canvas({mode} : CanvasProps){
         } 
 
         //본문 place holder문제있음
-        addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
-            if(res){
-                navigate(-1)
-            }
-        })
+
+        if(mode === "new"){
+            addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
+                if(res){
+                    navigate(-1)
+                }
+            })
+        }else{
+            editPost(titleRef.current.value , contentRef.current.value).then(res => {
+                if(res){
+                    navigate(`/detail/${post.contentId}`)
+                }
+            })
+        }
+        
     }
 
     const moveToPostList = () => {
@@ -105,10 +115,12 @@ export function Canvas({mode} : CanvasProps){
             if(titleRef.current){
                 titleRef.current.value = post.title
             }
+
+            if(pwRef.current){ 
+                pwRef.current.value = "수정중 입니다"
+            }
         }
-
-
-    },[titleRef])
+    },[titleRef, pwRef])
 
     return(
         <>
@@ -127,24 +139,15 @@ export function Canvas({mode} : CanvasProps){
                     style={{height : Constant.MiddlePaperSize - 150}}
                     value={postAvailable? post.content : ""}
                 />
-                {mode === "new" &&
-                    <InputBase //숫자만 accept하기
+                <InputBase //숫자만 accept하기
                         fullWidth
                         sx={{ height : '3.5rem', mt : 5, p : 2}}
                         placeholder="수정 / 삭제용 비밀번호(4~6자리)"
                         inputRef={pwRef}
                         inputProps={{ maxLength : 6}}
-                        type="password"
-                    /> 
-                }
-                <InputBase //숫자만 accept하기
-                        fullWidth
-                        disabled
-                        sx={{ height : '3.5rem', mt : 5, p : 2}}
-                        value = "수정중입니다"
-                        inputRef={pwRef}
-                        inputProps={{ maxLength : 6}}
-                    /> 
+                        type={postAvailable ? "text" : "password"}
+                        disabled={postAvailable ? true : false}
+                /> 
             </Paper>
             <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Constant.ColorCode.darkBlue}}>
                 {/* 링크 연결 나중에 */}

@@ -34,6 +34,10 @@ export function useAlert(){
                 color = "error"
                 break;
             }
+            case ErrorCode.UnmatchedUnlockCode : {
+                color = "error"
+                break;
+            }
         }
 
         setAlertState(color)

@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { AlertColor } from "@mui/material";
 
 import { Messages, Post } from "../data";
@@ -6,6 +6,7 @@ import { AlertMessage, PostDeleteDialog, PostEditDialog, } from "../component";
 
 import { useAlert } from "../hook/useAlert";
 import HygallRepository from "./HygallRepository";
+import { usePostEditDialog } from "../hook/usePostEditDialog";
 
 type HygallProviderPros = {
     children : ReactNode
@@ -26,6 +27,7 @@ type HygallContext = { //get, change, set
     getPostList : () => void
     getPost : (contentId : number) => void
     addPost : (title : string, content : string, unlockCode : string) => Promise<boolean>
+    editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
 
     setListBreakPoint : (breakPoint : number) => void
@@ -33,6 +35,9 @@ type HygallContext = { //get, change, set
     setSearchKeyword : (keyword : string) => void
     uploadImage : (formData : FormData) => Promise<string | undefined>
     cleanPost : () => void
+
+    openPostEditDialog : () => void
+    closePostEditDialog : () => void
 
     mainList : Post.PostList[]
     post : Post.Post
@@ -62,8 +67,9 @@ export function HygallProvider ({children} : HygallProviderPros){
     const [searchKeyword, setSearchKeyword] = useState<string>("")
     const [searchTargetData, setSearchTargetData] = useState<SearchTargetData[]>([])
     const [filteredMainList, setFilteredMainList] = useState<Post.PostList[]>([])
-
+    
     const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
+    const [showPostEditDialog, setShowPostEditDialog] = usePostEditDialog()
 
     useEffect(() => {
         if(mainList.length > 0) {
@@ -117,6 +123,21 @@ export function HygallProvider ({children} : HygallProviderPros){
        });
    }
 
+   const editPost = async (title : string, content : string) => {
+
+    const alertMsg = onAlertStateChange as Function
+
+   if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
+    alertMsg(Messages.ErrorCode.NoAddContent)
+       return false
+   }
+
+   return await hygallRepository.editPost(post.contentId, title, content).then((res)=>{
+    alertMsg(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+       return res
+   });
+}
+
    const deletePost = async () => {
     if(post.contentId < 1) {
         return;
@@ -163,17 +184,36 @@ export function HygallProvider ({children} : HygallProviderPros){
         setPost(new Post.Post(-1,{}))
     }
 
+    const openPostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
+    const closePostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(false)
+    
+    //unlock code
+    const checkUnlockCode = async (inputUnlockCode : string) => {
+        return await hygallRepository.checkUnlockCode(post.contentId, inputUnlockCode).then(response => {
+            if(!response) {
+                (onAlertStateChange as Function)(Messages.ErrorCode.UnmatchedUnlockCode)
+            }else{
+                closePostEditDialog()
+            }
+
+            return response
+        })
+    }
+
     return(
         <HygallContext.Provider value={{
             getPostList,
             getPost,
             addPost,
+            editPost,
             deletePost,
             setListBreakPoint,
             setSearchKeyword,
             appendSearchTargetData,
             uploadImage,
             cleanPost,
+            openPostEditDialog,
+            closePostEditDialog,
             mainList,
             post,
             filteredMainList,
@@ -188,7 +228,12 @@ export function HygallProvider ({children} : HygallProviderPros){
                 alertState={alertState as AlertColor} 
                 alertMessage={alertMessage as string}/>
             <PostDeleteDialog />
-            <PostEditDialog />
+            <PostEditDialog 
+                show={showPostEditDialog  as boolean}
+                handleClose={closePostEditDialog}
+                checkUnlockCode={checkUnlockCode}
+                contentId={post.contentId}
+            />
         </HygallContext.Provider>
     )
 }
