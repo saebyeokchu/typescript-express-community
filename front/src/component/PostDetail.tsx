@@ -28,20 +28,7 @@ function Comment({content, createdAt} : CommentProps){
 }
 
 export function PostDetail(){
-    const navigate = useNavigate()
-    const { post, deletePost, openPostEditDialog, openPostDeleteDialog } = useHygallContext()
-    const [ openDeleteSnackBar, setOpenDeleteSnackBar ] = useState<boolean>(false)
-
-    const onEditClicked = () => {
-        openPostEditDialog()
-       // navigate(`/edit/${post.contentId}`)
-    }
-    const onDeleteClicked = async () => {
-        openPostDeleteDialog()
-        // if(await deletePost()){
-        //     navigate('/')
-        // }
-    }
+    const { post, openPostEditDialog, openPostDeleteDialog } = useHygallContext()
 
     return(
         <Box>
@@ -77,9 +64,10 @@ export function PostDetail(){
                                 justifyContent:'center',
                                 width:'100%',
                                 gap:'10px'}}>
+                                <Button variant="contained" size="small">댓글 {post.commentCount}</Button>
                                 <Button variant="contained" color="warning" size="small">좋아요 {post.like}</Button>
-                                <Button variant="contained" size="small" onClick={onEditClicked}>수정</Button>
-                                <Button variant="contained" onClick={onDeleteClicked} size="small">삭제</Button>
+                                <Button variant="contained" size="small" onClick={openPostEditDialog}>수정</Button>
+                                <Button variant="contained" onClick={openPostDeleteDialog} size="small">삭제</Button>
                             </Box>
                         </Box>
                     </CardContent>
@@ -89,58 +77,24 @@ export function PostDetail(){
                             backgroundColor:Constant.ColorCode.lightGrey, 
                             p:1
                         }}>
-                        <Box sx={{display:'flex', justifyContent:'space-between'}}>
-                            <Box sx={{ gap:'10px', justifyContent: 'flex-end', display: 'flex' }}>
-                                <Chip
-                                    color="primary"
-                                    label={`댓글 ${post.commentCount}`}
+                        <Box sx={{ display:'flex', flexDirection:'column', gap:'10px'}}>
+                            <Paper sx={{width:'100%'}} component="form">
+                                <InputBase
+                                    fullWidth
+                                    multiline
+                                    rows={5}
+                                    maxRows="5"
+                                    sx={{ ml: 1 , p :2 }}
+                                    placeholder="댓글(최대 200자)"
+                                    inputProps={{  maxLength:200 }}
+                                    size="small"
                                 />
-                            </Box>
-                            <Box sx={{ display:'flex', flexDirection:'row', gap:'10px'}}>
-                                <Paper component="form"  sx={{ width: '80%'}}>
-                                    <InputBase
-                                        sx={{ ml: 1 }}
-                                        placeholder="댓글(최대 200자)"
-                                        inputProps={{ 'aria-label': 'search' }}
-                                    />
-                                </Paper>
-                                <Button variant="contained">등록</Button>
-                            </Box>
+                            </Paper>
+                            <Button variant="contained">등록</Button>
                         </Box>
-                        
-                        {/* <Paper>
-                            <InputBase 
-                                fullWidth
-                                rows={3}
-                                placeholder="댓글"
-                                sx={{p:2}}/> 
-                        </Paper> */}
                     </Box>
-                    {/* Action */}
-                    {/* <Snackbar 
-                        open={openDeleteSnackBar} 
-                        autoHideDuration={500} 
-                        anchorOrigin={{vertical:'bottom', horizontal:'center'}}
-                    >
-                        <Alert
-                            severity="error"
-                            sx={{width:'600px'}}
-                            action={
-                                <ButtonGroup>
-                                    <Button color="inherit" size="small" onClick={onDeleteClicked}>
-                                        삭제할께요
-                                    </Button>
-                                    <Button color="success" size="small" onClick={()=>setOpenDeleteSnackBar(false)}>
-                                        안 할래요
-                                    </Button>
-                                </ButtonGroup>
-                              }
-                        >
-                            <span>삭제하시면 되돌릴 수 없어요!</span>
-                        </Alert>
-                    </Snackbar> */}
-                    {/* 댓글 (5줄?) */}
                     
+                    {/* 댓글 (5줄?) */}
                     <div>
                         {Post.PostTemplate.comments.map( (e, index) => {
                             return <Comment key={`post-detail-comment-${index}`} content={e.content} createdAt={e.createdAt}/>

@@ -8,6 +8,7 @@ const PostTemplate : Post = {
     viewCount: 200,
     createdAt: '2023-03-04 11:23:58',
     unlockCode: '123456',
+    like:0,
     comments: [
         {
             id: 1,
