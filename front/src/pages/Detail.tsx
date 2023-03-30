@@ -11,19 +11,19 @@ export function Detail(){
     let { contentId } = useParams()
     const { getPost, post } = useHygallContext()
 
-
     if(contentId === undefined){
         return <Loading />
     }
+
+    console.log(contentId)
 
     useEffect(() => { 
         getPost(parseInt(contentId as string))
     },[])
 
-
     return(
         <>
-            { post.contentId < 1 ? <Loading /> : <PostDetail /> }
+            { post.contentId < 0 ? <Loading /> : <PostDetail /> }
             <PostList />
             <SearchBar />
         </>

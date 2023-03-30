@@ -4,9 +4,8 @@ import { AlertColor } from "@mui/material";
 import { Messages, Post } from "../data";
 import { AlertMessage, PostDeleteDialog, PostEditDialog, } from "../component";
 
-import { useAlert } from "../hook/useAlert";
 import HygallRepository from "./HygallRepository";
-import { usePostEditDialog } from "../hook/usePostEditDialog";
+import { useAlert, usePostEditDialog, usePostDeleteDialog } from "../hook";
 
 type HygallProviderPros = {
     children : ReactNode
@@ -21,7 +20,6 @@ type uploadResponse = {
     fileName : string
     message : string
 }
-
 
 type HygallContext = { //get, change, set
     getPostList : () => void
@@ -38,6 +36,8 @@ type HygallContext = { //get, change, set
 
     openPostEditDialog : () => void
     closePostEditDialog : () => void
+    openPostDeleteDialog : () => void
+    closePostDeleteDialog : () => void
 
     mainList : Post.PostList[]
     post : Post.Post
@@ -62,6 +62,7 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     const [mainList,setMainList] = useState<Post.PostList[]>([])
     const [post,setPost] = useState<Post.Post>(new Post.Post(-1,{}))
+    const [notice,setNotice] = useState<Post.Post>(new Post.Post(-1,{}))
 
     const [listBreakPoint, setListBreakPoint] = useState<number>(-1)
     const [searchKeyword, setSearchKeyword] = useState<string>("")
@@ -70,6 +71,7 @@ export function HygallProvider ({children} : HygallProviderPros){
     
     const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
     const [showPostEditDialog, setShowPostEditDialog] = usePostEditDialog()
+    const [showPostDeleteDialog, setShowPostDeleteDialog] = usePostDeleteDialog()
 
     useEffect(() => {
         if(mainList.length > 0) {
@@ -83,22 +85,22 @@ export function HygallProvider ({children} : HygallProviderPros){
             if(response.status === 200){
                 setMainList(response.data as Post.PostList[]) //다른거 들어올 일 없음)
             }else{
-                onAlertStateChange(Messages.ErrorCode.Unkwoun)
+                (onAlertStateChange as Function)(Messages.ErrorCode.Unkwoun)
             }
         });
     }
 
     const getPost = async (contentId : number) => {
-
         await hygallRepository.getPost(contentId).then(response => {
             if(response.status === 200){
                 // console.log("before", post)
                 setPost(response.data[0] as Post.Post)
                 // console.log("after", post)
             }else{
-                onAlertStateChange(Messages.ErrorCode.Unkwoun)
+                (onAlertStateChange as Function)(Messages.ErrorCode.Unkwoun)
             }
         })
+       
     }
 
     const addPost = async (title : string, content : string, unlockCode : string) => {
@@ -149,9 +151,9 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
         
         if(response){
-            onAlertStateChange(Messages.ErrorCode.Success)
+            (onAlertStateChange as Function)(Messages.ErrorCode.Success)
         }else{
-            onAlertStateChange(Messages.ErrorCode.DeleteFail)
+            (onAlertStateChange as Function)(Messages.ErrorCode.DeleteFail)
         }
 
         return response
@@ -184,9 +186,6 @@ export function HygallProvider ({children} : HygallProviderPros){
         setPost(new Post.Post(-1,{}))
     }
 
-    const openPostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
-    const closePostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(false)
-    
     //unlock code
     const checkUnlockCode = async (inputUnlockCode : string) => {
         return await hygallRepository.checkUnlockCode(post.contentId, inputUnlockCode).then(response => {
@@ -199,6 +198,11 @@ export function HygallProvider ({children} : HygallProviderPros){
             return response
         })
     }
+
+    const openPostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
+    const closePostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(false)
+    const openPostDeleteDialog = () => (setShowPostDeleteDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
+    const closePostDeleteDialog = () => (setShowPostDeleteDialog as React.Dispatch<React.SetStateAction<boolean>>)(false)
 
     return(
         <HygallContext.Provider value={{
@@ -214,6 +218,8 @@ export function HygallProvider ({children} : HygallProviderPros){
             cleanPost,
             openPostEditDialog,
             closePostEditDialog,
+            openPostDeleteDialog,
+            closePostDeleteDialog,
             mainList,
             post,
             filteredMainList,
@@ -227,7 +233,12 @@ export function HygallProvider ({children} : HygallProviderPros){
                 show={showAlertMessage as boolean} 
                 alertState={alertState as AlertColor} 
                 alertMessage={alertMessage as string}/>
-            <PostDeleteDialog />
+            <PostDeleteDialog 
+                show={showPostDeleteDialog as boolean}
+                handleClose={closePostDeleteDialog}
+                checkUnlockCode={checkUnlockCode}
+                deletePost={deletePost}
+            />
             <PostEditDialog 
                 show={showPostEditDialog  as boolean}
                 handleClose={closePostEditDialog}

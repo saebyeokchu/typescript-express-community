@@ -1,6 +1,12 @@
+$lightGrey : #EAEAEA;
+
 /* text - white */
 .tw {
     color : white
+}
+
+.tg {
+    color : $lightGrey
 }
 
 .no-underline {

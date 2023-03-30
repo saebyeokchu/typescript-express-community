@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { Ref, useRef, useState } from "react"
 import { TransitionProps } from '@mui/material/transitions'
 import { Button, Dialog, DialogActions, DialogContent, InputBase, Paper, Slide, TextField } from "@mui/material";
 import { ConstructionOutlined, Label } from "@mui/icons-material";
@@ -21,13 +21,13 @@ const Transition = React.forwardRef(function Transition(
 })
 
 export function PostEditDialog({show, handleClose, checkUnlockCode, contentId} : PostEditDialogProps){
-    const unlockCodeInputRef = useRef()
+    const unlockCodeInputRef = useRef<any>()
     const navigate = useNavigate()
 
-    const confirmUnlockCode = async() => {
+    const onEditConfirmClicked = async() => {
         if(!unlockCodeInputRef.current) return;
 
-        const inputVal = unlockCodeInputRef.current['value'];
+        const inputVal = unlockCodeInputRef.current.value;
         const unlockedPassed = await checkUnlockCode(inputVal)
 
         if(unlockedPassed) navigate(`/edit/${contentId}`)
@@ -52,10 +52,11 @@ export function PostEditDialog({show, handleClose, checkUnlockCode, contentId} :
                     label="수정 / 삭제용 비밀번호(4~6자리)"
                     type="password"
                     inputRef={unlockCodeInputRef}
+                    inputProps={{ maxLength : 6}}
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={confirmUnlockCode}>확인</Button>
+                <Button onClick={onEditConfirmClicked}>확인</Button>
                 <Button onClick={handleClose}>닫기</Button>
             </DialogActions>
         </Dialog>

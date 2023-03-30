@@ -1,7 +1,7 @@
 async function getPostList(){    
     //view version for main list
-    return await contents.find({}, {comments : 0, content : 0}).sort({contentId : -1});
-    // db.contents.find({contentId : {$gte : 1, $lt : 3}})
+    return await contents.find({ contentId : { $gt : 0 }}, {comments : 0, content : 0}).sort({contentId : -1});
+    // db.contents.find({contentId : {$gte : 1, $lt : 3}}) contentId : { $gt : 0 }
 }
 
 async function getPost(contentId){
