@@ -29,7 +29,7 @@ function Comment({content, createdAt} : CommentProps){
 
 export function PostDetail(){
     const navigate = useNavigate()
-    const { post, deletePost, editPost, openPostEditDialog } = useHygallContext()
+    const { post, deletePost, openPostEditDialog, openPostDeleteDialog } = useHygallContext()
     const [ openDeleteSnackBar, setOpenDeleteSnackBar ] = useState<boolean>(false)
 
     const onEditClicked = () => {
@@ -37,10 +37,10 @@ export function PostDetail(){
        // navigate(`/edit/${post.contentId}`)
     }
     const onDeleteClicked = async () => {
-        setOpenDeleteSnackBar(false)
-        if(await deletePost()){
-            navigate('/')
-        }
+        openPostDeleteDialog()
+        // if(await deletePost()){
+        //     navigate('/')
+        // }
     }
 
     return(
@@ -79,7 +79,7 @@ export function PostDetail(){
                                 gap:'10px'}}>
                                 <Button variant="contained" color="warning" size="small">좋아요 {post.like}</Button>
                                 <Button variant="contained" size="small" onClick={onEditClicked}>수정</Button>
-                                <Button variant="contained" onClick={() => setOpenDeleteSnackBar(true)} size="small">삭제</Button>
+                                <Button variant="contained" onClick={onDeleteClicked} size="small">삭제</Button>
                             </Box>
                         </Box>
                     </CardContent>
@@ -117,7 +117,7 @@ export function PostDetail(){
                         </Paper> */}
                     </Box>
                     {/* Action */}
-                    <Snackbar 
+                    {/* <Snackbar 
                         open={openDeleteSnackBar} 
                         autoHideDuration={500} 
                         anchorOrigin={{vertical:'bottom', horizontal:'center'}}
@@ -138,7 +138,7 @@ export function PostDetail(){
                         >
                             <span>삭제하시면 되돌릴 수 없어요!</span>
                         </Alert>
-                    </Snackbar>
+                    </Snackbar> */}
                     {/* 댓글 (5줄?) */}
                     
                     <div>
