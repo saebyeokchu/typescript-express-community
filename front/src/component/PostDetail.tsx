@@ -54,7 +54,7 @@ export function PostDetail(){
                     {/* 중간 콘텐츠만 고정값 */}
                     <CardContent>
                         <Box sx={{position:'relative', minHeight:'300px'}}>
-                            <Box sx={{pt:2, width:'100%',pb:5}}>
+                            <Box sx={{pt:2, width:'100%',pb:20}}> 
                                 <div dangerouslySetInnerHTML={{__html: post.content}} />
                             </Box>
                             <Box sx={{

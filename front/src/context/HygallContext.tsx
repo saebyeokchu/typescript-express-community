@@ -243,7 +243,7 @@ export function HygallProvider ({children} : HygallProviderPros){
                 show={showPostEditDialog  as boolean}
                 handleClose={closePostEditDialog}
                 checkUnlockCode={checkUnlockCode}
-                contentId={post.contentId}
+                contentId={post? post.contentId : undefined}
             />
         </HygallContext.Provider>
     )

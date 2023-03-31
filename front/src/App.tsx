@@ -18,9 +18,9 @@ function App(){
         <NavBar />
         <Routes>
           <Route path="/" element={<Main />} />
-          <Route path="/detail/:contentId" element={<Detail />} />
+          {/* <Route path="/detail/:contentId" element={<Detail />} />
           <Route path="/new" element={<New />} />
-          <Route path="/edit/:contentId" element={<Edit />} />
+          <Route path="/edit/:contentId" element={<Edit />} /> */}
         </Routes>
       </Container>
     </HygallProvider>

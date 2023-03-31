@@ -1,136 +1,83 @@
-async function getPostList(){    
-    //view version for main list
-    return await contents.find({ contentId : { $gt : 0 }}, {comments : 0, content : 0}).sort({contentId : -1});
-    // db.contents.find({contentId : {$gte : 1, $lt : 3}}) contentId : { $gt : 0 }
-}
+import prerequest from "../back/configs/prerequest.js"
+import dbconfig from "../back/configs/dbconfig.js"
+import PostService from "./services/PostService.js" 
 
-async function getPost(contentId){
-    return await contents.find({contentId}, {_id : 0, unlockCode : 0})
-}
+const [app, PORT, router] = prerequest()
 
-async function getPostUnlockCode(contentId){
-    return await contents.find({contentId},{unlockCode:1})
-}
-
-function addPost(newContent){
-    return contents.insertMany([newContent]);
-}
-
-function editPost(contentId, title, content){
-    return contents.updateOne({contentId},{$set : {title, content}})
-}
-
-function deletePost(contentId){
-    return contents.deleteOne({contentId})
-}
-
-const express = require("express");
-const fileUpload = require("express-fileupload")
-const cors = require("cors");
-
-const { getUnlockCode, checkUnlockCode } = require("./util/unlockCode.js")
-
-const app = express();
-const PORT = 4000;
-
-app.use(cors());
-
-//file upload
-app.use(fileUpload());
-app.use(express.static('public'));
-
-//connecting to mongodb using mongoose
-const mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/hygall1",{
-    useNewUrlParser:true
-});
-
-const connection = mongoose.connection;
-connection.once("open", function(){
-    console.log("Connection with MongoDB was successful");
-});
-
-let contents = require("./model.js");
-const moment = require("moment/moment.js");
-
-//router
-const router = express.Router();
-
-app.use("/",router);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const ps = PostService();
+ps()
 
 
-//get post list
-router.route("/getPostList").get(function(req, res){
-    getPostList().then(function(items){
-        res.send(items)
-    })
-})
+// //get post list
+// router.route("/getPostList").get(function(req, res){
+//     postAction().getPostList().then(function(items){
+//         res.send(items)
+//     })
+// })
 
-//get post
-router.route("/getPost/:contentId").get(function(req, res){
-    getPost(req.params.contentId).then(function(item){
-        res.send(item)
-    });
-})
+// //get post
+// router.route("/getPost/:contentId").get(function(req, res){
+//     post.getPost(req.params.contentId).then(function(item){
+//         res.send(item)
+//     });
+// })
 
 
-//add new content
-app.post("/addPost", function(req, res){
-    const reqBody = req.body;
-    reqBody.unlockCode = getUnlockCode(reqBody.unlockCode)
+// //add new content
+// app.post("/addPost", function(req, res){
+//     const reqBody = req.body;
+//     reqBody.unlockCode = getUnlockCode(reqBody.unlockCode)
     
-    addPost(reqBody).then(function(response){
-        res.send(response)
-    }) 
-})
+//     post.addPost(reqBody).then(function(response){
+//         res.send(response)
+//     }) 
+// })
 
-//edit content
-app.post("/editPost", function(req, res){
-    const reqBody = req.body;
+// //edit content
+// app.post("/editPost", function(req, res){
+//     const reqBody = req.body;
     
-    editPost(reqBody.contentId, reqBody.title, reqBody.content).then(function(response){
-        res.send(response)
-    }) 
-})
+//     post.editPost(reqBody.contentId, reqBody.title, reqBody.content).then(function(response){
+//         res.send(response)
+//     }) 
+// })
 
-router.route("/deletePost/:contentId").get(function(req,res){
-    deletePost(req.params.contentId).then(function(item){
-        res.send(item)
-    });
-})
+// router.route("/deletePost/:contentId").get(function(req,res){
+//     post.deletePost(req.params.contentId).then(function(item){
+//         res.send(item)
+//     });
+// })
 
 
-//upload image
-app.post("/uploadImage",async function(req, res){
-    const { file } = req.files;
+// //upload image
+// app.post("/uploadImage",async function(req, res){
+//     const { file } = req.files;
 
-    //test if type of image not matched
-    if(!/^image/.test(file.mimetype)){
-        res.status(400).send('No files were uploaded');
-    } 
+//     //test if type of image not matched
+//     if(!/^image/.test(file.mimetype)){
+//         res.status(400).send('No files were uploaded');
+//     } 
 
-    const fileName = moment().format('YYYYMMDDHHMMSS') + "." + file.mimetype.split('/')[1];
+//     const fileName = moment().format('YYYYMMDDHHMMSS') + "." + file.mimetype.split('/')[1];
 
-    file.mv(__dirname + '/public/' + fileName, function(err){
-        if(err) {
-            return res.status(500).send(err)
-        }
-    });
+//     file.mv(__dirname + '/public/' + fileName, function(err){
+//         if(err) {
+//             return res.status(500).send(err)
+//         }
+//     });
 
-    res.status(200).send({fileName,meesage : 'File is successfully uploaded'}); //all good
-})
+//     res.status(200).send({fileName,meesage : 'File is successfully uploaded'}); //all good
+// })
 
-//unlock code
-app.post("/checkUnlockCode", async function(req, res){
-    const reqBody = req.body;
+// //unlock code
+// app.post("/checkUnlockCode", async function(req, res){
+//     const reqBody = req.body;
     
-    const targetPost = await getPostUnlockCode(reqBody.contentId);
-    const checkResult = checkUnlockCode(reqBody.inputUnlockCode, targetPost[0].unlockCode);
+//     const targetPost = await getPostUnlockCode(reqBody.contentId);
+//     const checkResult = checkUnlockCode(reqBody.inputUnlockCode, targetPost[0].unlockCode);
 
-    res.send(checkResult)
-})
+//     res.send(checkResult)
+// })
 
 app.listen(PORT, function() {
     console.log("Server is running on Port : " + PORT);
