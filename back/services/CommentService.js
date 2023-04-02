@@ -1,3 +1,6 @@
-function updateComment() {
-    return db.contents.updateOne({contentId : 1},{$push : {comments : {id : 1, comment : "환영합니다", createdAt : "2023-03-31 18:23:59"}}})
+import { Post } from "../model/Post.js"
+
+
+function addComment(contentId, commentBody) {
+    return Post.updateOne({contentId : contentId},{$push : {comments : commentBody}})
 }

@@ -3,11 +3,12 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 import { Canvas } from "../component";
 import { useHygallContext } from "../context/HygallContext";
+import { useAlert } from "../hook";
 
 
 export function Edit(){
     const navigate = useNavigate()
-    const { post, cleanPost } = useHygallContext()
+    const { getPostList ,post, cleanPost } = useHygallContext()
     let { contentId } = useParams()
 
     useEffect(()=>{

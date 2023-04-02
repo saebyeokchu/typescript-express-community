@@ -13,7 +13,8 @@ const ErrorCode = {
     "ImageUploadFail" : "200",
     "DeleteFail" : "300",
     "UnmatchedUnlockCode" : "400",
-    "NoContent" : "500"
+    "NoContent" : "500",
+    "NoComment" : "600"
 }
 
 const AlertMessages : Map = {
@@ -36,7 +37,10 @@ const AlertMessages : Map = {
     "400" : "수정 / 삭제용 비밀번호가 일치하지 않습니다",
 
     //list
-    "500" : "등록된 글이 존재하지 않습니다"
+    "500" : "등록된 글이 존재하지 않습니다",
+
+    //comment
+    "600" : "등록된 댓글이 없습니다"
 }
 
 export {

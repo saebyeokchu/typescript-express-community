@@ -13,7 +13,7 @@ import { Loading } from "./";
 type CanvasProps = {
     mode : string | undefined
 }
-
+ 
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
 export function Canvas({mode} : CanvasProps){
     const navigate = useNavigate();
@@ -83,7 +83,6 @@ export function Canvas({mode} : CanvasProps){
         } 
 
         //본문 place holder문제있음
-
         if(mode === "new"){
             addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
                 if(res){
@@ -97,7 +96,6 @@ export function Canvas({mode} : CanvasProps){
                 }
             })
         }
-        
     }
 
     const moveToPostList = () => {
@@ -110,17 +108,24 @@ export function Canvas({mode} : CanvasProps){
         //history 있으면 clear
     }
 
-    useEffect(() => {
+    useEffect(() => {  
         if(postAvailable){
+            const quillObj = contentRef.current.getEditor()
+            const range = quillObj.getSelection(true)
+
             if(titleRef.current){
                 titleRef.current.value = post.title
             }
 
             if(pwRef.current){ 
-                pwRef.current.value = "수정중 입니다"
+                pwRef.current.value = "수정중 입니다"  
             }
+
+            if(contentRef.current){ //#9 proper cursor position    
+                contentRef.current.value = post.content 
+            } 
         }
-    },[titleRef, pwRef])
+    },[titleRef, pwRef])        
 
     return(
         <>
@@ -137,7 +142,7 @@ export function Canvas({mode} : CanvasProps){
                     modules={modules}
                     ref={contentRef}
                     style={{height : Constant.MiddlePaperSize - 150}}
-                    value={postAvailable? post.content : ""}
+                    // value={postAvailable? post.content : ""}
                 />
                 <InputBase //숫자만 accept하기
                         fullWidth

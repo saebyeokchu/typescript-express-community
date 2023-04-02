@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-// import Comment from "./Comment";
+// import commentSchema from "./Comment";
 
 const postSchema = new Schema({
     // _id : {
@@ -26,7 +26,14 @@ const postSchema = new Schema({
     unlockCode : {
         type : String
     },
-    // comments : [Comment]
+    comments : {
+        type : [{
+            id : Number,
+            content : String,
+            createdAt : String,
+            unlockCode : String
+        }],
+    }
 },{
     collection:'contents',
     versionKey: false //here

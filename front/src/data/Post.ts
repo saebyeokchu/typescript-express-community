@@ -51,6 +51,10 @@ class Post{
         this.contentId = count + 1 //나중에 자동 increase 시키면 좋겠다
         this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")//날짜 설정하기
     }
+
+   public isEmpty(){
+     return this.title === "" || this.content === ""
+   }
 }
 
 const PostListTemplate : PostList = { //temp

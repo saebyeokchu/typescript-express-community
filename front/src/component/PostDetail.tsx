@@ -3,26 +3,28 @@ import { useNavigate } from "react-router-dom";
 
 import { Card,Box, CardContent, Typography, Paper, InputBase, Button, Chip, Snackbar, Alert, ButtonGroup } from "@mui/material";
 
-import { Constant, Post } from "../data";
+import { Constant, Messages, Post } from "../data";
 import { useHygallContext } from "../context/HygallContext";
-import { MiddleBreak } from "./";
+import { MiddleBreak, Notice } from "./";
 
 type CommentProps = {
-    content : string,
-    createdAt : string
+    comment : Post.Comment
 }
 
-function Comment({content, createdAt} : CommentProps){
+function Comment({comment} : CommentProps){
+
+    console.log(comment) 
+
     return(
         <Card sx={{borderBottom:`1px ${Constant.ColorCode.lightGrey} solid`}}>
-            <CardContent>
+            {/* <CardContent>
                 <Box>
                     <strong>ㅇㅇ</strong> | {createdAt}
                 </Box>
                 <Box sx={{mt:1}}>
                     {content}
                 </Box>
-            </CardContent>
+            </CardContent> */}
         </Card>
     )
 }
@@ -83,7 +85,6 @@ export function PostDetail(){
                                     fullWidth
                                     multiline
                                     rows={5}
-                                    maxRows="5"
                                     sx={{ ml: 1 , p :2 }}
                                     placeholder="댓글(최대 200자)"
                                     inputProps={{  maxLength:200 }}
@@ -96,9 +97,9 @@ export function PostDetail(){
                     
                     {/* 댓글 (5줄?) */}
                     <div>
-                        {Post.PostTemplate.comments.map( (e, index) => {
-                            return <Comment key={`post-detail-comment-${index}`} content={e.content} createdAt={e.createdAt}/>
-                        })}
+                        {post && post.commentCount > 0 ? post.comments.map( (e, index) => {
+                            return <Comment key={`post-detail-comment-${index}`} comment={e}/>
+                        }) : <Notice errorCode={Messages.ErrorCode.NoComment} reactElement={undefined} variant="sx" />}
                     </div>
                     <MiddleBreak />
                 </React.Fragment>
