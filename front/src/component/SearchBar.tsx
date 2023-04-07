@@ -1,12 +1,14 @@
 import {Box, Button, Paper, InputBase} from '@mui/material'
-import React, { createRef, forwardRef, useRef } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useHygallContext } from '../context/HygallContext'
 import { Constant } from '../data'
 
-export function SearchBar(){
-    const { setSearchKeyword } = useHygallContext()
+type SearchBarProps = {
+    setSearchKeyword : Function
+}
+
+export function SearchBar({setSearchKeyword} : SearchBarProps){
     const ref = useRef<HTMLInputElement>()
 
     return(

@@ -1,14 +1,22 @@
 import { useEffect } from 'react'
 
-import { Box, Button, CircularProgress, Paper} from '@mui/material'
+import { Box } from '@mui/material'
 import { SearchBar, PostList, Loading, Notice } from '../component'
 import { useHygallContext } from '../context/HygallContext'
 import { Constant, Messages } from '../data'
 
 export function Main(){
-    const { getPostList, filteredMainList, cleanPost, cleanPostList } = useHygallContext()
+    const { 
+        getPostList,
+        cleanPost, 
+        cleanPostList, 
+        filteredMainList,
+        searchTargetData,
+        appendSearchTargetData,
+        setSearchKeyword
+    } = useHygallContext()
 
-    useEffect(() => { 
+    useEffect(() => {
         cleanPostList()
         getPostList()
         cleanPost()
@@ -23,9 +31,21 @@ export function Main(){
             </Box>
             {
                 filteredMainList === undefined || filteredMainList.length === 0 ? 
-                <Notice errorCode={Messages.ErrorCode.NoContent} reactElement={undefined} variant={undefined} />  : <PostList />
+                    <Notice 
+                        errorCode={Messages.ErrorCode.NoContent} 
+                        reactElement={undefined} 
+                        variant={undefined} 
+                    />  
+                        : 
+                    <PostList 
+                        filteredMainList = {filteredMainList}
+                        searchTargetData = {searchTargetData}
+                        appendSearchTargetData = {appendSearchTargetData}
+                    />
             }
-            <SearchBar/>
+            <SearchBar 
+                setSearchKeyword = {setSearchKeyword}
+            />
         </>
     )
 }

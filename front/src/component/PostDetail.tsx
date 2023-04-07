@@ -1,39 +1,63 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Card,Box, CardContent, Typography, Paper, InputBase, Button, Chip, Snackbar, Alert, ButtonGroup } from "@mui/material";
+import { Card,Box, CardContent, Typography, Paper, InputBase, Button, CardActions, IconButton } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import { Constant, Messages, Post } from "../data";
-import { useHygallContext } from "../context/HygallContext";
-import { MiddleBreak, Notice } from "./";
+import { MiddleBreak } from "./MiddleBreak";  
+import { Notice } from "./Notice";
 
 type CommentProps = {
     comment : Post.Comment
 }
 
-function Comment({comment} : CommentProps){
+type PostDetailProps = {
+    post : Post.Post
+    openPostEditDialog : Function
+    openPostDeleteDialog : Function
+    addComment : Function
+}
 
-    console.log(comment) 
-
+function Comment({comment} : CommentProps){ 
     return(
         <Card sx={{borderBottom:`1px ${Constant.ColorCode.lightGrey} solid`}}>
-            {/* <CardContent>
-                <Box>
-                    <strong>ㅇㅇ</strong> | {createdAt}
+            <CardContent>
+                <Box sx={{justifyContent:'space-between', alignItems: 'center'}} display="flex">
+                    <Box><strong>ㅇㅇ</strong> | {comment.createdAt}</Box>
+                    <Box>
+                        <IconButton aria-label="add to favorites">
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
                 </Box>
-                <Box sx={{mt:1}}>
-                    {content}
+                <Box sx={{mt:2,justifyContent:'space-between'}} display="flex">
+                    <Box>{comment.content}</Box>
                 </Box>
-            </CardContent> */}
+            </CardContent>
+            
         </Card>
     )
 }
 
-export function PostDetail(){
-    const { post, openPostEditDialog, openPostDeleteDialog } = useHygallContext()
+export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, addComment } : PostDetailProps){
+    const commentRef = useRef<string>()
+    const pwRef = useRef<string>()
 
-    return(
-        <Box>
+    const handleCommentButtonClicked = async () => {
+        if(commentRef && commentRef.current && pwRef && pwRef.current){
+            await addComment(commentRef.current.value, pwRef.current.value).then((response : boolean) => {
+                if(response){
+                    commentRef.current.value = ""
+                }
+            })
+        }
+    }
+
+    console.log(post)
+    
+    return(  
+        <Box> 
             <Card variant="outlined" >
                 <React.Fragment>
                     <Box>
@@ -64,15 +88,15 @@ export function PostDetail(){
                                 bottom:'2px',
                                 display:'flex',
                                 justifyContent:'center',
-                                width:'100%',
+                                width:'100%', 
                                 gap:'10px'}}>
                                 <Button variant="contained" size="small">댓글 {post.commentCount}</Button>
                                 <Button variant="contained" color="warning" size="small">좋아요 {post.like}</Button>
-                                <Button variant="contained" size="small" onClick={openPostEditDialog}>수정</Button>
-                                <Button variant="contained" onClick={openPostDeleteDialog} size="small">삭제</Button>
+                                <Button variant="contained" size="small" onClick={()=>openPostEditDialog()}>수정</Button>
+                                <Button variant="contained" onClick={()=>openPostDeleteDialog()} size="small">삭제</Button>
                             </Box>
                         </Box>
-                    </CardContent>
+                    </CardContent> 
                     {/* 댓글 알림창 */}
                     <Box 
                         sx={{
@@ -89,18 +113,28 @@ export function PostDetail(){
                                     placeholder="댓글(최대 200자)"
                                     inputProps={{  maxLength:200 }}
                                     size="small"
-                                />
+                                    inputRef={commentRef}
+                                /> 
                             </Paper>
-                            <Button variant="contained">등록</Button>
+                            <Paper sx={{width:'100%'}} component="form">
+                                <InputBase //숫자만 accept하기
+                                    fullWidth
+                                    sx={{ height : '3.5rem', p : 2}}
+                                    placeholder="수정 / 삭제용 비밀번호(4~6자리)"
+                                    inputRef={pwRef}
+                                    inputProps={{ maxLength : 6}}
+                                    // type={postAvailable ? "text" : "password"}
+                                /> 
+                            </Paper>
+                            <Button variant="contained" onClick={handleCommentButtonClicked}>등록</Button>
                         </Box>
                     </Box>
-                    
                     {/* 댓글 (5줄?) */}
-                    <div>
+                    <Box>
                         {post && post.commentCount > 0 ? post.comments.map( (e, index) => {
                             return <Comment key={`post-detail-comment-${index}`} comment={e}/>
-                        }) : <Notice errorCode={Messages.ErrorCode.NoComment} reactElement={undefined} variant="sx" />}
-                    </div>
+                        })  : <Notice errorCode={Messages.ErrorCode.NoComment} reactElement={undefined} variant="sx" />}
+                    </Box>
                     <MiddleBreak />
                 </React.Fragment>
             </Card>

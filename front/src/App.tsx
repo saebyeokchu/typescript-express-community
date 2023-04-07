@@ -13,8 +13,8 @@ import {
 function App(){
   
   return (
-    <HygallProvider>
-      <Container>
+    <HygallProvider> 
+      <Container> 
         <NavBar />
         <Routes>
           <Route path="/" element={<Main />} />

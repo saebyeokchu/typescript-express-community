@@ -1,6 +1,10 @@
 import { Post } from "../model/Post.js"
 
-
-function addComment(contentId, commentBody) {
-    return Post.updateOne({contentId : contentId},{$push : {comments : commentBody}})
+function addComment(contentId, newComment) {
+    return Post.updateOne({contentId : contentId},{$push : {comments : newComment}, $inc : { commentCount : 1}})
 }
+
+export {
+    addComment
+}
+

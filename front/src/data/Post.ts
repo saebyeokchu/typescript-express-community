@@ -13,17 +13,20 @@ const PostTemplate : Post = {
         {
             id: 1,
             content: '재밌어요',
-            createdAt: '2023-03-04 11:23:58'
+            createdAt: '2023-03-04 11:23:58',
+            unlockCode: ''
         },
         {
             id: 2,
             content: '선생님 다음편 주세요...',
-            createdAt: '2023-03-04 11:23:58'
+            createdAt: '2023-03-04 11:23:58',
+            unlockCode: ''
         },
         {
             id: 3,
             content: 'ㄱㅊ',
-            createdAt: '2023-03-04 11:23:58'
+            createdAt: '2023-03-04 11:23:58',
+            unlockCode: ''
         }
     ],
 }
@@ -32,6 +35,13 @@ class Comment{
     id : number = -1
     content : string = ""
     createdAt : string = ""
+    unlockCode : string = ""
+
+    public constructor(init? : Partial<Comment>){
+        Object.assign(this, init)
+
+        this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")//날짜 설정하기
+    }
 }
 
 class Post{

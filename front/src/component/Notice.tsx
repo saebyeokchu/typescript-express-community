@@ -3,7 +3,7 @@ import { Button, CircularProgress, Paper, Typography } from "@mui/material"
 import { Constant, Messages } from "../data"
 
 
-type NoticeProps = {
+type NoticeProps = {  
     errorCode : string,
     reactElement : ReactJSXElement | undefined,
     variant : string | undefined

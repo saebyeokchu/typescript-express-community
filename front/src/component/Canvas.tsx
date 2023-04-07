@@ -2,8 +2,7 @@ import React, { useRef, useMemo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Paper, InputBase, Box, Button } from "@mui/material"
 
-import { Constant } from "../data"
-import { useHygallContext } from "../context/HygallContext";
+import { Constant, Post } from "../data"
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -12,18 +11,22 @@ import { Loading } from "./";
 
 type CanvasProps = {
     mode : string | undefined
+    post : Post.Post | undefined
+    addPost : Function
+    uploadImage : Function
+    cleanPost : Function
+    editPost : Function
 }
  
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
-export function Canvas({mode} : CanvasProps){
+export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} : CanvasProps){
     const navigate = useNavigate();
-    const {addPost, uploadImage, post, cleanPost, editPost} = useHygallContext()
 
     const titleRef = useRef<any>()
     let contentRef = useRef<any>()
     const pwRef = useRef<any>()
 
-    const postAvailable = post.contentId > 0;
+    const postAvailable = post != undefined && post.contentId > 0;
 
     if(mode===undefined || mode === "") {
         return <Loading />
@@ -48,7 +51,7 @@ export function Canvas({mode} : CanvasProps){
                 formData.append('resource_type','raw')
 
                 //save image to express server
-                await uploadImage(formData).then(response => {
+                await uploadImage(formData).then((response : Promise<string | undefined>) => {
                     if(response){
                         quillObj.editor.insertEmbed(range.index, 'image',response)
                         quillObj.setSelection(range.index + 1)
@@ -92,7 +95,7 @@ export function Canvas({mode} : CanvasProps){
         }else{
             editPost(titleRef.current.value , contentRef.current.value).then(res => {
                 if(res){
-                    navigate(`/detail/${post.contentId}`)
+                    navigate(`/detail/${post.contentId}`) 
                 }
             })
         }
@@ -108,7 +111,8 @@ export function Canvas({mode} : CanvasProps){
         //history 있으면 clear
     }
 
-    useEffect(() => {  
+    useEffect(() => {
+        console.log(postAvailable)
         if(postAvailable){
             const quillObj = contentRef.current.getEditor()
             const range = quillObj.getSelection(true)

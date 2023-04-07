@@ -1,7 +1,7 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { AlertColor } from "@mui/material";
 
-import { Messages, Post } from "../data";
+import { Messages, Post, Search } from "../data";
 import { AlertMessage, PostDeleteDialog, PostEditDialog, } from "../component";
 
 import HygallRepository from "./HygallRepository";
@@ -9,11 +9,6 @@ import { useAlert, usePostEditDialog, usePostDeleteDialog } from "../hook";
 
 type HygallProviderPros = {
     children : ReactNode
-}
-
-type SearchTargetData = {
-    contentId : number
-    title : string
 }
 
 type uploadResponse = {
@@ -28,8 +23,10 @@ type HygallContext = { //get, change, set
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
 
+    addComment : (commentContnet : string) => void
+
     setListBreakPoint : (breakPoint : number) => void
-    appendSearchTargetData : (searchTargetData : SearchTargetData) => void
+    appendSearchTargetData : (searchTargetData : Search.SearchTargetData) => void
     setSearchKeyword : (keyword : string) => void
     uploadImage : (formData : FormData) => Promise<string | undefined>
     cleanPost : () => void
@@ -45,7 +42,7 @@ type HygallContext = { //get, change, set
     filteredMainList : Post.PostList[]
     listBreakPoint : number
     searchKeyword : string
-    searchTargetData : SearchTargetData[]
+    searchTargetData : Search.SearchTargetData[]
 }
 
 const HygallContext = createContext({} as HygallContext)
@@ -53,7 +50,6 @@ const HygallContext = createContext({} as HygallContext)
 const api = 'http://127.0.0.1:4000';
 
 export function useHygallContext(){
-    console.log("useHygallContext")
     return useContext(HygallContext)
 }
 
@@ -64,14 +60,13 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     const [mainList,setMainList] = useState<Post.PostList[]>([])
     const [post,setPost] = useState<Post.Post>(new Post.Post(-1,{}))
-    const [notice,setNotice] = useState<Post.Post>(new Post.Post(-1,{}))
 
     const [listBreakPoint, setListBreakPoint] = useState<number>(-1)
     const [searchKeyword, setSearchKeyword] = useState<string>("")
-    const [searchTargetData, setSearchTargetData] = useState<SearchTargetData[]>([])
+    const [searchTargetData, setSearchTargetData] = useState<Search.SearchTargetData[]>([])
     const [filteredMainList, setFilteredMainList] = useState<Post.PostList[]>([])
     
-    const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
+    const {alertState, onAlertStateChange, alertMessage, showAlertMessage} = useAlert()
     const [showPostEditDialog, setShowPostEditDialog] = usePostEditDialog()
     const [showPostDeleteDialog, setShowPostDeleteDialog] = usePostDeleteDialog()
 
@@ -110,10 +105,6 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const addPost = async (title : string, content : string, unlockCode : string) => {
-
-        if(typeof(onAlertStateChange) !== "function"){ 
-           return false
-        }
 
        if(unlockCode.length < 4){
            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
@@ -167,7 +158,7 @@ export function HygallProvider ({children} : HygallProviderPros){
 
    }
 
-    const appendSearchTargetData = (newSearchData : SearchTargetData) => setSearchTargetData([ ... searchTargetData, newSearchData]) 
+    const appendSearchTargetData = (newSearchData : Search.SearchTargetData) => setSearchTargetData([ ... searchTargetData, newSearchData]) 
 
     //추후 발전방향, 검색버튼을 누르면 그 순간 데이터를 저장 ? 세션같은데?
     const filterMainList = () => { //title 거르기 (일단), 조건은 chip and search keywords
@@ -184,7 +175,10 @@ export function HygallProvider ({children} : HygallProviderPros){
             if(typeof(response) === "object"){
                 return `${api}/${(response as uploadResponse).fileName}`
             }
-        }).catch(() => onAlertStateChange(Messages.ErrorCode.ImageUploadFail))
+        }).catch(() => {
+            onAlertStateChange(Messages.ErrorCode.ImageUploadFail)
+            return undefined
+        })
     }
 
     const cleanPost = () => {
@@ -216,6 +210,30 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     }
 
+    //comment
+    const addComment = async (content : string, unlockCode : string) => {
+        if(!content) {
+            onAlertStateChange(Messages.ErrorCode.NoAddContent)
+            return false
+        }
+
+        if(post.contentId < 1){
+            onAlertStateChange(Messages.ErrorCode.AddFail)
+            return false
+        }
+
+        const response : boolean =  await hygallRepository.addComment(post.contentId, new Post.Comment({content, unlockCode}))
+        
+        if(response){
+            onAlertStateChange(Messages.ErrorCode.Success)
+            getPost(post.contentId)
+        }else{
+            onAlertStateChange(Messages.ErrorCode.AddFail)
+        }
+
+        return response
+    }
+
     const openPostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
     const closePostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(false)
     const openPostDeleteDialog = () => (setShowPostDeleteDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
@@ -228,6 +246,7 @@ export function HygallProvider ({children} : HygallProviderPros){
             addPost,
             editPost,
             deletePost,
+            addComment,
             setListBreakPoint,
             setSearchKeyword,
             appendSearchTargetData,

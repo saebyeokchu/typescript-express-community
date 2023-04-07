@@ -9,8 +9,18 @@ import { Messages } from "../data";
 export function Detail(){
     const navigate = useNavigate()
     let { contentId } = useParams()
-    const { getPost, post } = useHygallContext()
-    let postAvailable = false
+    const { 
+        getPost, 
+        post,
+        searchTargetData,
+        filteredMainList,
+        appendSearchTargetData,
+        openPostEditDialog, 
+        openPostDeleteDialog, 
+        addComment,
+        setSearchKeyword
+    } = useHygallContext()
+    let postAvailable = false 
 
     useEffect(() => { 
         if(typeof(getPost) === "function"){
@@ -24,28 +34,29 @@ export function Detail(){
         }
     },[post])
 
-    // console.log(post)
-
-    // if(typeof(post.isEmpty) === "function"){
-    //     console.log(post.title)
-    //     console.log(post.content)
-    //     console.log(post.isEmpty())
-    //     postAvailable = !post.isEmpty()
-    // }
-
-
     return(
         <>
             { 
                 post ?
                     post.content !== "" && post.title !=="" && <>
-                        <PostDetail />
-                        <PostList />
+                        <PostDetail 
+                             post={post} 
+                             openPostEditDialog={openPostEditDialog} 
+                             openPostDeleteDialog={openPostDeleteDialog} 
+                             addComment={addComment}
+                        />
+                        <PostList 
+                            filteredMainList = {filteredMainList}
+                            searchTargetData = {searchTargetData}
+                            appendSearchTargetData = {appendSearchTargetData}
+                        />
                     </>
                         : 
                     <Notice errorCode={Messages.ErrorCode.LoadFail} reactElement={<Button variant="contained" onClick={() => navigate("/")}>목록으로</Button>} variant={undefined}/> 
             }
-            <SearchBar />
+            <SearchBar 
+                setSearchKeyword = {setSearchKeyword}
+            />
         </>
     )
 }
