@@ -1,21 +1,26 @@
 import { useEffect } from 'react'
 
-import { Box, CircularProgress, Paper} from '@mui/material'
-import { SearchBar, PostList, Loading } from '../component'
+import { Box } from '@mui/material'
+import { SearchBar, PostList, Loading, Notice } from '../component'
 import { useHygallContext } from '../context/HygallContext'
-import { Constant } from '../data'
+import { Constant, Messages } from '../data'
 
 export function Main(){
-    const { getPostList, filteredMainList, cleanPost } = useHygallContext()
+    const { 
+        getPostList,
+        cleanPost, 
+        cleanPostList, 
+        filteredMainList,
+        searchTargetData,
+        appendSearchTargetData,
+        setSearchKeyword
+    } = useHygallContext()
 
-    useEffect(() => { 
+    useEffect(() => {
+        cleanPostList()
         getPostList()
         cleanPost()
-    },[])
-
-    if(filteredMainList === undefined){
-        <Loading /> 
-    }
+    },[]) 
 
     return (
         <>  
@@ -24,8 +29,23 @@ export function Main(){
                 <div>HYGDP는 해외연예갤러리의 대피소입니다.</div>
                 <div><a href="/detail/0">공지 확인하기</a></div>
             </Box>
-                {filteredMainList.length == 0 ? <Loading />  : <PostList />}
-            <SearchBar/>
+            {
+                filteredMainList === undefined || filteredMainList.length === 0 ? 
+                    <Notice 
+                        errorCode={Messages.ErrorCode.NoContent} 
+                        reactElement={undefined} 
+                        variant={undefined} 
+                    />  
+                        : 
+                    <PostList 
+                        filteredMainList = {filteredMainList}
+                        searchTargetData = {searchTargetData}
+                        appendSearchTargetData = {appendSearchTargetData}
+                    />
+            }
+            <SearchBar 
+                setSearchKeyword = {setSearchKeyword}
+            />
         </>
     )
 }

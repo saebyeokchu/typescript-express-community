@@ -8,7 +8,7 @@ type PostEditDialogProps = {
     show : boolean,
     handleClose : any,
     checkUnlockCode : Function,
-    contentId : number
+    contentId : number | undefined
 }
 
 const Transition = React.forwardRef(function Transition(

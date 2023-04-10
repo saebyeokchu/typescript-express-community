@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { ListBreakPointButton } from '../component'
 import { Constant } from '../data'
 
-export function NavBar(){
+export function NavBar(){ 
     return(
         <Box sx={{justifyContent:'flex-start', backgroundColor:Constant.ColorCode.darkBlue}}>
             <Box sx={{textAlign:'right',pt:'1rem',pr:'1rem',pb:'0.5rem'}}>

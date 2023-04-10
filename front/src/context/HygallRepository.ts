@@ -20,7 +20,7 @@ export default class HygallRepository implements HygallRepositoryInterface{
 
     async addPost(newPost : Post.Post) : Promise<boolean> { //async 필요없음
         return await axios.post(`${tempApiUrl}/addPost`,newPost).then(response => {
-            return response.status === 200
+            return response.status === 200 ? response.data.contentId : false
         })
     }
 
@@ -47,6 +47,13 @@ export default class HygallRepository implements HygallRepositoryInterface{
     async checkUnlockCode(contentId:number,inputUnlockCode:string) : Promise<boolean>{
         return await axios.post(`${tempApiUrl}/checkUnlockCode`,{contentId, inputUnlockCode}).then(response => {
             return response.status===200 ? response.data : false
+        })
+    }
+
+    //comment
+    async addComment(contentId : number, newComment : Post.Comment) : Promise<boolean> { //async 필요없음
+        return await axios.post(`${tempApiUrl}/addComment`,{contentId, newComment}).then(response => {
+            return response.status === 200
         })
     }
 }

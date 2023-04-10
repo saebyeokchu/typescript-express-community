@@ -33,6 +33,7 @@ export function PostDeleteDialog({show, handleClose, checkUnlockCode, deletePost
 
         if(unlockedPassed){
             if(await deletePost()){
+                console.log("successfuly deleted")
                 navigate("/")
                 handleClose()
             }

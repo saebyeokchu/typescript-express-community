@@ -4,7 +4,7 @@ import { Messages } from "../data";
 
 export function useAlert(){
     const [alertState, setAlertState] = useState<AlertColor>("success")//'success' | 'info' | 'warning' | 'error'
-    const [alerterMessage, setAlerterMessage] = useState<string>("")
+    const [alertMessage, setAlertMessage] = useState<string>("")
     const [showAlertMessage, setShowAlertMessage] = useState<boolean>(false)
 
     const ErrorCode = Messages.ErrorCode;
@@ -41,10 +41,11 @@ export function useAlert(){
         }
 
         setAlertState(color)
-        setAlerterMessage(Messages.AlertMessages[e])
+        setAlertMessage(Messages.AlertMessages[e])
         window.setTimeout(() => setShowAlertMessage(false), 3000)
     }, [])
 
-    return [ alertState, onAlertStateChange, alerterMessage, showAlertMessage] 
- 
+    return {
+        alertState, onAlertStateChange, alertMessage, showAlertMessage
+    } 
 }

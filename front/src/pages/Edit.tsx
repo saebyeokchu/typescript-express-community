@@ -5,9 +5,9 @@ import { Canvas } from "../component";
 import { useHygallContext } from "../context/HygallContext";
 
 
-export function Edit(){
+export function Edit(){ 
     const navigate = useNavigate()
-    const { post, cleanPost } = useHygallContext()
+    const {addPost, uploadImage, post, cleanPost, editPost} = useHygallContext()
     let { contentId } = useParams()
 
     useEffect(()=>{
@@ -19,8 +19,15 @@ export function Edit(){
     },[])
 
     return (
-        <Canvas 
-            mode = "edit"
-        />
+        post &&
+            <Canvas 
+                mode = "edit"
+                post = {post}
+                addPost = {addPost}
+                uploadImage ={uploadImage}
+                cleanPost = {cleanPost}
+                editPost = {editPost}
+            />
+        
     )
 }

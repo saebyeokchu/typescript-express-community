@@ -17,5 +17,6 @@
     "express-fileupload": "^1.4.0",
     "mongodb": "^5.1.0",
     "mongoose": "^7.0.1"
-  }
+  },
+  "type" : "module"
 }

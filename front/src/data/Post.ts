@@ -8,21 +8,25 @@ const PostTemplate : Post = {
     viewCount: 200,
     createdAt: '2023-03-04 11:23:58',
     unlockCode: '123456',
+    like:0,
     comments: [
         {
             id: 1,
             content: '재밌어요',
-            createdAt: '2023-03-04 11:23:58'
+            createdAt: '2023-03-04 11:23:58',
+            unlockCode: ''
         },
         {
             id: 2,
             content: '선생님 다음편 주세요...',
-            createdAt: '2023-03-04 11:23:58'
+            createdAt: '2023-03-04 11:23:58',
+            unlockCode: ''
         },
         {
             id: 3,
             content: 'ㄱㅊ',
-            createdAt: '2023-03-04 11:23:58'
+            createdAt: '2023-03-04 11:23:58',
+            unlockCode: ''
         }
     ],
 }
@@ -31,6 +35,13 @@ class Comment{
     id : number = -1
     content : string = ""
     createdAt : string = ""
+    unlockCode : string = ""
+
+    public constructor(init? : Partial<Comment>){
+        Object.assign(this, init)
+
+        this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")//날짜 설정하기
+    }
 }
 
 class Post{
@@ -47,9 +58,13 @@ class Post{
     public constructor(count : number, init? : Partial<Post>){
         Object.assign(this, init)
 
-        this.contentId = count + 1 //나중에 자동 increase 시키면 좋겠다
+        //this.contentId = count + 1 //나중에 자동 increase 시키면 좋겠다
         this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")//날짜 설정하기
     }
+
+   public isEmpty(){
+     return this.title === "" || this.content === ""
+   }
 }
 
 const PostListTemplate : PostList = { //temp

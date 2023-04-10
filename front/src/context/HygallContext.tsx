@@ -1,7 +1,7 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { AlertColor } from "@mui/material";
 
-import { Messages, Post } from "../data";
+import { Messages, Post, Search } from "../data";
 import { AlertMessage, PostDeleteDialog, PostEditDialog, } from "../component";
 
 import HygallRepository from "./HygallRepository";
@@ -11,28 +11,26 @@ type HygallProviderPros = {
     children : ReactNode
 }
 
-type SearchTargetData = {
-    contentId : number
-    title : string
-}
-
 type uploadResponse = {
     fileName : string
     message : string
 }
 
 type HygallContext = { //get, change, set
-    getPostList : () => void
+    getPostList : () => Promise<boolean>
     getPost : (contentId : number) => void
     addPost : (title : string, content : string, unlockCode : string) => Promise<boolean>
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
 
+    addComment : (commentContnet : string) => Promise<boolean>
+
     setListBreakPoint : (breakPoint : number) => void
-    appendSearchTargetData : (searchTargetData : SearchTargetData) => void
+    appendSearchTargetData : (searchTargetData : Search.SearchTargetData) => void
     setSearchKeyword : (keyword : string) => void
     uploadImage : (formData : FormData) => Promise<string | undefined>
     cleanPost : () => void
+    cleanPostList : () => void
 
     openPostEditDialog : () => void
     closePostEditDialog : () => void
@@ -44,7 +42,7 @@ type HygallContext = { //get, change, set
     filteredMainList : Post.PostList[]
     listBreakPoint : number
     searchKeyword : string
-    searchTargetData : SearchTargetData[]
+    searchTargetData : Search.SearchTargetData[]
 }
 
 const HygallContext = createContext({} as HygallContext)
@@ -62,14 +60,13 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     const [mainList,setMainList] = useState<Post.PostList[]>([])
     const [post,setPost] = useState<Post.Post>(new Post.Post(-1,{}))
-    const [notice,setNotice] = useState<Post.Post>(new Post.Post(-1,{}))
 
     const [listBreakPoint, setListBreakPoint] = useState<number>(-1)
     const [searchKeyword, setSearchKeyword] = useState<string>("")
-    const [searchTargetData, setSearchTargetData] = useState<SearchTargetData[]>([])
+    const [searchTargetData, setSearchTargetData] = useState<Search.SearchTargetData[]>([])
     const [filteredMainList, setFilteredMainList] = useState<Post.PostList[]>([])
     
-    const [alertState, onAlertStateChange, alertMessage, showAlertMessage] = useAlert()
+    const {alertState, onAlertStateChange, alertMessage, showAlertMessage} = useAlert()
     const [showPostEditDialog, setShowPostEditDialog] = usePostEditDialog()
     const [showPostDeleteDialog, setShowPostDeleteDialog] = usePostDeleteDialog()
 
@@ -81,12 +78,16 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     const getPostList = async () => {
         //refresh 할때만 불러오면 좋겠다
-        await hygallRepository.getPostList().then(response => {
-            if(response.status === 200){
+        return await hygallRepository.getPostList().then(response => {
+            const success = response.status === 200;
+
+            if(success){
                 setMainList(response.data as Post.PostList[]) //다른거 들어올 일 없음)
             }else{
                 (onAlertStateChange as Function)(Messages.ErrorCode.Unkwoun)
             }
+
+            return success;
         });
     }
 
@@ -105,10 +106,6 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     const addPost = async (title : string, content : string, unlockCode : string) => {
 
-        if(typeof(onAlertStateChange) !== "function"){ 
-           return false
-        }
-
        if(unlockCode.length < 4){
            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
            return false
@@ -119,8 +116,8 @@ export function HygallProvider ({children} : HygallProviderPros){
            return false
        }
 
-       return await hygallRepository.addPost(new Post.Post(mainList.length,{title, content, unlockCode})).then((res)=>{
-           onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+       return await hygallRepository.addPost(new Post.Post(mainList.length,{title, content, unlockCode})).then((res : boolean | number)=>{
+           onAlertStateChange(typeof(res) === "number" ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
            return res
        });
    }
@@ -161,7 +158,7 @@ export function HygallProvider ({children} : HygallProviderPros){
 
    }
 
-    const appendSearchTargetData = (newSearchData : SearchTargetData) => setSearchTargetData([ ... searchTargetData, newSearchData]) 
+    const appendSearchTargetData = (newSearchData : Search.SearchTargetData) => setSearchTargetData([ ... searchTargetData, newSearchData]) 
 
     //추후 발전방향, 검색버튼을 누르면 그 순간 데이터를 저장 ? 세션같은데?
     const filterMainList = () => { //title 거르기 (일단), 조건은 chip and search keywords
@@ -170,7 +167,6 @@ export function HygallProvider ({children} : HygallProviderPros){
         }else{
             setFilteredMainList(mainList.filter(l => l.viewCount >= listBreakPoint && l.title.includes(searchKeyword)))
         }
-
     }
 
     //save image to express server
@@ -179,15 +175,29 @@ export function HygallProvider ({children} : HygallProviderPros){
             if(typeof(response) === "object"){
                 return `${api}/${(response as uploadResponse).fileName}`
             }
-        }).catch(() => onAlertStateChange(Messages.ErrorCode.ImageUploadFail))
+        }).catch(() => {
+            onAlertStateChange(Messages.ErrorCode.ImageUploadFail)
+            return undefined
+        })
     }
 
     const cleanPost = () => {
         setPost(new Post.Post(-1,{}))
     }
 
+    const cleanPostList = () => {
+        setMainList([])
+        setFilteredMainList([])
+    }
+
     //unlock code
     const checkUnlockCode = async (inputUnlockCode : string) => {
+        const unlockCodeLength = inputUnlockCode.length;
+        if(unlockCodeLength < 4 || unlockCodeLength > 6){
+            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
+            return;
+        }
+
         return await hygallRepository.checkUnlockCode(post.contentId, inputUnlockCode).then(response => {
             if(!response) {
                 (onAlertStateChange as Function)(Messages.ErrorCode.UnmatchedUnlockCode)
@@ -197,6 +207,37 @@ export function HygallProvider ({children} : HygallProviderPros){
 
             return response
         })
+
+    }
+
+    //comment
+    const addComment = async (content : string, unlockCode : string) => {
+        const unlockCodeLength = unlockCode.length;
+        if(unlockCodeLength < 4 || unlockCodeLength > 6){
+            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
+            return;
+        }
+
+        if(!content) {
+            onAlertStateChange(Messages.ErrorCode.NoAddContent)
+            return false
+        }
+
+        if(post.contentId < 1){
+            onAlertStateChange(Messages.ErrorCode.AddFail)
+            return false
+        }
+
+        const response : boolean =  await hygallRepository.addComment(post.contentId, new Post.Comment({content, unlockCode}))
+        
+        if(response){
+            onAlertStateChange(Messages.ErrorCode.Success)
+            getPost(post.contentId)
+        }else{
+            onAlertStateChange(Messages.ErrorCode.AddFail)
+        }
+
+        return response
     }
 
     const openPostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
@@ -211,11 +252,13 @@ export function HygallProvider ({children} : HygallProviderPros){
             addPost,
             editPost,
             deletePost,
+            addComment,
             setListBreakPoint,
             setSearchKeyword,
             appendSearchTargetData,
             uploadImage,
             cleanPost,
+            cleanPostList,
             openPostEditDialog,
             closePostEditDialog,
             openPostDeleteDialog,
@@ -243,7 +286,7 @@ export function HygallProvider ({children} : HygallProviderPros){
                 show={showPostEditDialog  as boolean}
                 handleClose={closePostEditDialog}
                 checkUnlockCode={checkUnlockCode}
-                contentId={post.contentId}
+                contentId={post? post.contentId : undefined}
             />
         </HygallContext.Provider>
     )

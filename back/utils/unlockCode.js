@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs")
+import bcrypt from 'bcryptjs'
 const saltRounds = 10 
 
 function getUnlockCode(unlockCode = ''){
@@ -11,7 +11,7 @@ function checkUnlockCode(inputUnlockCode = '', storedUnlockCode = ''){//authenti
     return bcrypt.compareSync(inputUnlockCode, storedUnlockCode)
 }
 
-module.exports = {
+export {
     getUnlockCode,
     checkUnlockCode
 }

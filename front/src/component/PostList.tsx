@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination, CircularProgress, Chip} from '@mui/material'
 
 import { useHygallContext } from '../context/HygallContext';
-import { Messages } from '../data';
+import { Messages, Post, Search } from '../data';
+import { useAlert } from '../hook';
 
 
 interface TablePaginationActionsProps {
@@ -14,6 +15,12 @@ interface TablePaginationActionsProps {
     event : React.MouseEvent<HTMLButtonElement>,
     newPage : number
   ) => void
+}
+
+type PostListProps = {
+  filteredMainList : Post.PostList[]
+  searchTargetData : Search.SearchTargetData[]
+  appendSearchTargetData : Function
 }
 
 function TablePaginationActions(props : TablePaginationActionsProps){
@@ -55,15 +62,16 @@ function TablePaginationActions(props : TablePaginationActionsProps){
 }
 
 
-export function PostList() {
-  const navigate = useNavigate();
+export function PostList( { filteredMainList, searchTargetData, appendSearchTargetData } : PostListProps ) {  
+  const navigate = useNavigate() 
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const { filteredMainList, searchTargetData, appendSearchTargetData } = useHygallContext()
+  const {onAlertStateChange} = useAlert()
 
-  if(filteredMainList === undefined) {
+
+  if(filteredMainList === undefined) { 
     return <span />
-  }
+  } 
 
   useEffect(() => {
     //search용 데이터 묶음 만들기
