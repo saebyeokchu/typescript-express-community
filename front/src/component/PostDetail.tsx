@@ -49,12 +49,11 @@ export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, ad
             await addComment(commentRef.current.value, pwRef.current.value).then((response : boolean) => {
                 if(response){
                     commentRef.current.value = ""
+                    pwRef.current.value = ""
                 }
             })
         }
     }
-
-    console.log(post)
     
     return(  
         <Box> 

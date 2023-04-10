@@ -58,7 +58,7 @@ class Post{
     public constructor(count : number, init? : Partial<Post>){
         Object.assign(this, init)
 
-        this.contentId = count + 1 //나중에 자동 increase 시키면 좋겠다
+        //this.contentId = count + 1 //나중에 자동 increase 시키면 좋겠다
         this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")//날짜 설정하기
     }
 

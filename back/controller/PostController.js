@@ -25,8 +25,8 @@ app.post("/addPost", function(req, res){
     const reqBody = req.body;
     reqBody.unlockCode = Utils.getUnlockCode(reqBody.unlockCode)
     
-    PostService.addPost(reqBody).then(function(response){
-        res.send(response)
+    PostService.addPost(reqBody).then(function(contentId){
+        res.status(200).send({contentId}); //all good
     }) 
 })
 

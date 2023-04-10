@@ -23,7 +23,7 @@ type HygallContext = { //get, change, set
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
 
-    addComment : (commentContnet : string) => void
+    addComment : (commentContnet : string) => Promise<boolean>
 
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : Search.SearchTargetData) => void
@@ -116,8 +116,8 @@ export function HygallProvider ({children} : HygallProviderPros){
            return false
        }
 
-       return await hygallRepository.addPost(new Post.Post(mainList.length,{title, content, unlockCode})).then((res)=>{
-           onAlertStateChange(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+       return await hygallRepository.addPost(new Post.Post(mainList.length,{title, content, unlockCode})).then((res : boolean | number)=>{
+           onAlertStateChange(typeof(res) === "number" ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
            return res
        });
    }
@@ -194,7 +194,7 @@ export function HygallProvider ({children} : HygallProviderPros){
     const checkUnlockCode = async (inputUnlockCode : string) => {
         const unlockCodeLength = inputUnlockCode.length;
         if(unlockCodeLength < 4 || unlockCodeLength > 6){
-            (onAlertStateChange as Function)(Messages.ErrorCode.ShortLockCode)
+            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
             return;
         }
 
@@ -212,6 +212,12 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     //comment
     const addComment = async (content : string, unlockCode : string) => {
+        const unlockCodeLength = unlockCode.length;
+        if(unlockCodeLength < 4 || unlockCodeLength > 6){
+            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
+            return;
+        }
+
         if(!content) {
             onAlertStateChange(Messages.ErrorCode.NoAddContent)
             return false

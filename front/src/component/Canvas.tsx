@@ -87,9 +87,9 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
 
         //본문 place holder문제있음
         if(mode === "new"){
-            addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then(res => {
-                if(res){
-                    navigate(-1)
+            addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then((res : boolean | number) => {
+                if(typeof(res) === "number"){
+                    navigate(`/detail/${res}`)
                 }
             })
         }else{
@@ -112,7 +112,6 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
     }
 
     useEffect(() => {
-        console.log(postAvailable)
         if(postAvailable){
             const quillObj = contentRef.current.getEditor()
             const range = quillObj.getSelection(true)

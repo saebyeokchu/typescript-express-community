@@ -20,7 +20,7 @@ export default class HygallRepository implements HygallRepositoryInterface{
 
     async addPost(newPost : Post.Post) : Promise<boolean> { //async 필요없음
         return await axios.post(`${tempApiUrl}/addPost`,newPost).then(response => {
-            return response.status === 200
+            return response.status === 200 ? response.data.contentId : false
         })
     }
 
