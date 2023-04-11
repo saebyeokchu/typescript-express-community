@@ -1,7 +1,18 @@
 import { Post } from "../model/Post.js"
 
 const getLastCommentId = async (contentId) => { //need to improved
-    return await Post.find({ contentId }, {comments : 1}).sort({"comments.id" : -1}).limit(1)
+    return await Post.find({ contentId }, 
+        {
+            contentId : 0, 
+            title : 0, 
+            content : 0, 
+            viewCount :0, 
+            commentCount : 0, 
+            createdCode :0,
+            unlockCode : 0, 
+            createdAt:0, 
+            comments : {$slice : 1}}
+        ).sort({"comments.id" : -1});
 }
 
 async function addComment(contentId, newComment) {
