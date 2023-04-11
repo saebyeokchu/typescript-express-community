@@ -23,10 +23,8 @@ export function Detail(){
     let postAvailable = false 
 
     useEffect(() => { 
-        if(typeof(getPost) === "function"){
-            getPost(parseInt(contentId as string))
-        } 
-    },[contentId]) 
+        getPost(parseInt(contentId as string))
+    },[]) 
 
     useEffect(() => {
         if(post){
@@ -48,7 +46,7 @@ export function Detail(){
                         <PostList 
                             filteredMainList = {filteredMainList}
                             searchTargetData = {searchTargetData}
-                            appendSearchTargetData = {appendSearchTargetData}
+                            appendSearchTargetData = {appendSearchTargetData} //여기 조회수 업데이트 하려고 다 불러와야 하남 ..
                         />
                     </>
                         : 

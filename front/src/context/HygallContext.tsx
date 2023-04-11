@@ -19,7 +19,8 @@ type uploadResponse = {
 type HygallContext = { //get, change, set
     getPostList : () => Promise<boolean>
     getPost : (contentId : number) => void
-    addPost : (title : string, content : string, unlockCode : string) => Promise<boolean>
+    increasePostViewCount : (contentId : number) => void
+    addPost : (title : string, content : string, unlockCode : string) => Promise<number | boolean>
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
 
@@ -96,12 +97,37 @@ export function HygallProvider ({children} : HygallProviderPros){
             if(response.status === 200){
                 // console.log("before", post)
                 setPost(response.data[0] as Post.Post)
+                
+                //불러온 포스트 갈아 끼우기(임시)
+                mainList.forEach(e  => {
+                    if(e.contentId === contentId){
+                        e.viewCount++
+                    }
+                })
+
+                // if(tempIndex > -1){
+                //     mainList[tempIndex].viewCount = post.viewCount 
+                //     setMainList(mainList)
+                //     console.log(mainList)
+                // }
+                
+
                 // console.log("after", post)
             }else{
                 (onAlertStateChange as Function)(Messages.ErrorCode.Unkwoun)
             }
         })
        
+    }
+
+    const increasePostViewCount = (contentId : number = -1) => {
+        if(contentId === -1 || contentId < 1) {
+            return
+        }
+
+        hygallRepository.increasePostViewCount(contentId)
+
+        //나중에 로그만 남기기
     }
 
     const addPost = async (title : string, content : string, unlockCode : string) => {
@@ -148,9 +174,9 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
         
         if(response){
-            (onAlertStateChange as Function)(Messages.ErrorCode.Success)
+            onAlertStateChange(Messages.ErrorCode.Success)
         }else{
-            (onAlertStateChange as Function)(Messages.ErrorCode.DeleteFail)
+            onAlertStateChange(Messages.ErrorCode.DeleteFail)
         }
 
         return response
@@ -249,6 +275,7 @@ export function HygallProvider ({children} : HygallProviderPros){
         <HygallContext.Provider value={{
             getPostList,
             getPost,
+            increasePostViewCount,
             addPost,
             editPost,
             deletePost,
