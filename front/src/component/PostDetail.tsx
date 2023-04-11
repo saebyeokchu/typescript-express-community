@@ -71,7 +71,7 @@ export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, ad
                                     ㅇㅇ | {post.createdAt}
                                 </Typography>
                                 <Typography color="text.secondary">
-                                    조회수 {post.commentCount} 
+                                    조회수 {post.viewCount} 
                                 </Typography>
                             </Box>
                         </div>

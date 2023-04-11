@@ -19,6 +19,10 @@ router.route("/getPost/:contentId").get(function(req, res){
     });
 })
 
+//get post
+router.route("/increasePostViewCount/:contentId").get(function(req, res){
+    PostService.increasePostViewCount(req.params.contentId);
+})
 
 //add new content
 app.post("/addPost", function(req, res){

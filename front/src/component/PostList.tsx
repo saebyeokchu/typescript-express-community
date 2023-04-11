@@ -62,7 +62,7 @@ function TablePaginationActions(props : TablePaginationActionsProps){
 }
 
 
-export function PostList( { filteredMainList, searchTargetData, appendSearchTargetData } : PostListProps ) {  
+export function PostList( { filteredMainList, searchTargetData, appendSearchTargetData, increasePostViewCount } : PostListProps ) {  
   const navigate = useNavigate() 
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)

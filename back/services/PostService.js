@@ -13,11 +13,16 @@ const getPostList = async () => {
 }
 
 const getPost = async (contentId) => {
-    return await Post.find({contentId}, {_id : 0, unlockCode : 0})
+    await increasePostViewCount(contentId);
+    return await Post.find({contentId}, {_id : 0, unlockCode : 0});
 }
 
 const getPostUnlockCode = async (contentId) => {
-    return await Post.find({contentId},{unlockCode:1})
+    return await Post.find({contentId},{unlockCode:1});
+}
+
+const increasePostViewCount = async (contentId) => {
+    await Post.updateOne({contentId},{$inc : { viewCount : 1 }});
 }
 
 const addPost = async (newContent) => {
@@ -43,6 +48,7 @@ export {
     getPostList,
     getPost,
     getPostUnlockCode,
+    increasePostViewCount,
     addPost,
     editPost,
     deletePost
