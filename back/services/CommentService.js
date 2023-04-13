@@ -15,7 +15,13 @@ const getLastCommentId = async (contentId) => { //need to improved
         ).sort({"comments.id" : -1});
 }
 
-async function addComment(contentId, newComment) {
+const getCommentUnlockCode = async (contentId, commentId) => {
+    const getCommentUnlockCode = await Post.find({contentId},{comments : {$elemMatch : {id : commentId}}})
+
+    return getCommentUnlockCode[0]['comments'] === undefined ? -1 : getCommentUnlockCode[0]['comments'][0]['unlockCode']
+}
+
+async function add(contentId, newComment) {
     const lastCommentIdQuery = await getLastCommentId(contentId);
     const lastCommentId = lastCommentIdQuery[0]['comments'].length === 0 ? 0 : lastCommentIdQuery[0]['comments'][0]['id'] + 1;
 
@@ -23,14 +29,15 @@ async function addComment(contentId, newComment) {
     return Post.updateOne({contentId : contentId},{$push : {comments : newComment}, $inc : { commentCount : 1}})
 }
 
-async function deleteComment(contentId, commentId){
-    const deleteResult = await Post.update({contentId}, { $pull : { "comments" : { "id" : commentId }} })
-
-    console.log(deleteResult)
+async function remove(contentId, commentId){
+    return await Post.updateOne({contentId}, { $pull : { "comments" : { "id" : commentId }} })
 }
 
+
+
 export {
-    addComment,
-    deleteComment
+    getCommentUnlockCode,
+    add,
+    remove
 }
 

@@ -10,4 +10,8 @@ export default interface HygallRepositoryInterface {
     deletePost(contentId : number) : Promise<boolean>
     uploadImage(formData : FormData) : Promise<boolean | object>
     checkUnlockCode(contentId:number,inputUnlockCode:string) : Promise<boolean>
+    checkUnlockCodeForComment(contentId : number, commentId : number, inputUnlockCode : string) : Promise<boolean>
+
+    //comment
+    removeComment(contentId : number, commentId : number) : Promise<boolean>
 }

@@ -9,6 +9,7 @@ import { PostEditDialog } from "./dialog/PostEditDialog"
 import { AlertMessage } from "./dialog/AlertMessage"
 import { Loading } from "./Loading"
 import { Notice } from "./Notice"
+import { CommentDeleteDialog } from "./dialog/CommentDeleteDialog"
 
 export { 
     PostDetail,
@@ -21,5 +22,7 @@ export {
     PostEditDialog,
     AlertMessage,
     Loading,
-    Notice
+    Notice,
+
+    CommentDeleteDialog
 }

@@ -10,23 +10,26 @@ import { Notice } from "./Notice";
 
 type CommentProps = {
     comment : Post.Comment
+    openCommentDeleteDialog : Function
 }
 
 type PostDetailProps = {
     post : Post.Post
     openPostEditDialog : Function
     openPostDeleteDialog : Function
+
     addComment : Function
+    openCommentDeleteDialog : Function
 }
 
-function Comment({comment} : CommentProps){ 
+function Comment({comment, openCommentDeleteDialog} : CommentProps){ 
     return(
         <Card sx={{borderBottom:`1px ${Constant.ColorCode.lightGrey} solid`}}>
             <CardContent>
                 <Box sx={{justifyContent:'space-between', alignItems: 'center'}} display="flex">
                     <Box><strong>ㅇㅇ</strong> | {comment.createdAt}</Box>
                     <Box>
-                        <IconButton aria-label="add to favorites">
+                        <IconButton aria-label="add to favorites" onClick={() => openCommentDeleteDialog(comment.id)}>
                             <DeleteIcon />
                         </IconButton>
                     </Box>
@@ -40,7 +43,7 @@ function Comment({comment} : CommentProps){
     )
 }
 
-export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, addComment } : PostDetailProps){
+export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, addComment, openCommentDeleteDialog } : PostDetailProps){
     const commentRef = useRef<string>()
     const pwRef = useRef<string>()
 
@@ -131,7 +134,7 @@ export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, ad
                     {/* 댓글 (5줄?) */}
                     <Box>
                         {post && post.commentCount > 0 ? post.comments.map( (e, index) => {
-                            return <Comment key={`post-detail-comment-${index}`} comment={e}/>
+                            return <Comment key={`post-detail-comment-${index}`} comment={e} openCommentDeleteDialog={openCommentDeleteDialog}/>
                         })  : <Notice errorCode={Messages.ErrorCode.NoComment} reactElement={undefined} variant="sx" />}
                     </Box>
                     <MiddleBreak />
