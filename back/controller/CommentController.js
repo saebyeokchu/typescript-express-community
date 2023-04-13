@@ -10,5 +10,11 @@ export default function CommentController(app, router){
             res.send(response)
         }) 
     })
+
+    router.route("/deleteComment/:commentId").get(function(req,res){
+        CommentService.DELETE(req.params.contentId, req.params.commentId).then(function(item){
+            res.send(item)
+        });
+    })
 }
 

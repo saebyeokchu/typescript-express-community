@@ -23,7 +23,14 @@ async function addComment(contentId, newComment) {
     return Post.updateOne({contentId : contentId},{$push : {comments : newComment}, $inc : { commentCount : 1}})
 }
 
+async function deleteComment(contentId, commentId){
+    const deleteResult = await Post.update({contentId}, { $pull : { "comments" : { "id" : commentId }} })
+
+    console.log(deleteResult)
+}
+
 export {
-    addComment
+    addComment,
+    deleteComment
 }
 
