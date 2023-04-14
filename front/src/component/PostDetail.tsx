@@ -116,16 +116,18 @@ export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, ad
                                     inputProps={{  maxLength:200 }}
                                     size="small"
                                     inputRef={commentRef}
+                                    autoComplete="off"
                                 /> 
                             </Paper>
                             <Paper sx={{width:'100%'}} component="form">
                                 <InputBase //숫자만 accept하기
                                     fullWidth
                                     sx={{ height : '3.5rem', p : 2}}
-                                    placeholder="수정 / 삭제용 비밀번호(4~6자리)"
+                                    placeholder="삭제용 비밀번호(4~6자리)"
                                     inputRef={pwRef}
                                     inputProps={{ maxLength : 6}}
-                                    // type={postAvailable ? "text" : "password"}
+                                    type="password"
+                                    autoComplete="off"
                                 /> 
                             </Paper>
                             <Button variant="contained" onClick={handleCommentButtonClicked}>등록</Button>

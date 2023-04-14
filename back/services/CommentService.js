@@ -30,7 +30,7 @@ async function add(contentId, newComment) {
 }
 
 async function remove(contentId, commentId){
-    return await Post.updateOne({contentId}, { $pull : { "comments" : { "id" : commentId }} })
+    return await Post.updateOne({contentId}, { $pull : { "comments" : { "id" : commentId }}, $inc : { commentCount : -1} })
 }
 
 

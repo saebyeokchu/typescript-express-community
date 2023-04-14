@@ -6,12 +6,14 @@ export default function CommentController(app, router){
         const reqBody = req.body; 
         reqBody.unlockCode = Utils.getUnlockCode(reqBody.unlockCode)
         
+        console.log(reqBody
+            )
         CommentService.add(reqBody.contentId,reqBody.newComment).then(function(response){
             res.send(response)
         }) 
     })
 
-    router.route("/removeComment/:commentId&:contentId").get(function(req,res){
+    router.route("/removeComment/:contentId&:commentId").get(function(req,res){
         CommentService.remove(req.params.contentId, req.params.commentId).then(function(item){
             res.send(item)
         });

@@ -102,22 +102,6 @@ export function HygallProvider ({children} : HygallProviderPros){
             if(response.status === 200){
                 // console.log("before", post)
                 setPost(response.data[0] as Post.Post)
-                
-                //불러온 포스트 갈아 끼우기(임시)
-                mainList.forEach(e  => {
-                    if(e.contentId === contentId){
-                        e.viewCount++
-                    }
-                })
-
-                // if(tempIndex > -1){
-                //     mainList[tempIndex].viewCount = post.viewCount 
-                //     setMainList(mainList)
-                //     console.log(mainList)
-                // }
-                
-
-                // console.log("after", post)
             }else{
                 (onAlertStateChange as Function)(Messages.ErrorCode.Unkwoun)
             }
@@ -131,7 +115,13 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
 
         hygallRepository.increasePostViewCount(contentId)
-
+                        
+        //불러온 포스트 갈아 끼우기(임시)
+        mainList.forEach(e  => {
+            if(e.contentId === contentId){
+                e.viewCount++
+            }
+        })
         //나중에 로그만 남기기
     }
 
@@ -286,6 +276,12 @@ export function HygallProvider ({children} : HygallProviderPros){
         const response : boolean =  await hygallRepository.addComment(post.contentId, new Post.Comment({content, unlockCode}))
         
         if(response){
+            //임시 comment +1
+            mainList.forEach(e  => {
+                if(e.contentId === post.contentId){
+                    e.commentCount ++
+                }
+            })
             onAlertStateChange(Messages.ErrorCode.Success)
             getPost(post.contentId)
         }else{
@@ -314,6 +310,11 @@ export function HygallProvider ({children} : HygallProviderPros){
             }
             
             if(response){
+                mainList.forEach(e  => {
+                    if(e.contentId === post.contentId){
+                        e.commentCount --
+                    }
+                })
                 getPost(post.contentId)
                 onAlertStateChange(Messages.ErrorCode.Success)
                 closeCommentDeleteDialog()
