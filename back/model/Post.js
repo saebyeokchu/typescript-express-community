@@ -1,20 +1,7 @@
-const { ObjectId } = require("mongodb");
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+import mongoose, { Schema } from "mongoose";
+// import commentSchema from "./Comment";
 
-let Comment = new Schema({
-    id : {
-        type : Number
-    },
-    content : {
-        type : String
-    },
-    createdAt : {
-        type : String
-    }
-})
-
-let contents = new Schema({
+const postSchema = new Schema({
     // _id : {
     //     type: ObjectId
     // },
@@ -39,10 +26,17 @@ let contents = new Schema({
     unlockCode : {
         type : String
     },
-    comments : [Comment]
+    comments : {
+        type : [{
+            id : Number,
+            content : String,
+            createdAt : String,
+            unlockCode : String
+        }],
+    }
 },{
     collection:'contents',
     versionKey: false //here
 });
 
-module.exports = mongoose.model("contents", contents);
+export const Post = mongoose.model("post", postSchema);

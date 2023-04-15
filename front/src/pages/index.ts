@@ -2,12 +2,12 @@ import { Main } from "./Main"
 import { Detail } from "./Detail"
 import { NavBar } from "./NavBar"
 import { New } from "./New"
-import { AlertMessage } from "./AlertMessage"
+import { Edit } from "./Edit"
 
 export { 
     Main,
     Detail,
     NavBar,
     New,
-    AlertMessage
+    Edit
 }

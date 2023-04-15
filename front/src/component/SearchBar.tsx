@@ -1,16 +1,24 @@
 import {Box, Button, Paper, InputBase} from '@mui/material'
-import React, { createRef, forwardRef, useRef } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-import { useHygallContext } from '../context/HygallContext'
-import { Color } from '../data'
+import { Constant } from '../data'
 
-export function SearchBar(){
-    const { setSearchKeyword } = useHygallContext()
+type SearchBarProps = {
+    setSearchKeyword : Function
+}
+
+export function SearchBar({setSearchKeyword} : SearchBarProps){
     const ref = useRef<HTMLInputElement>()
 
     return(
-        <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Color.Code.darkBlue}}>
+        <Box sx={{
+            display:'flex',
+            p:"0.5rem",
+            gap :"10px", 
+            justifyContent:'flex-end',
+            flexDirection:'row',
+            backgroundColor:Constant.ColorCode.darkBlue}}>
             <Paper component="form"  sx={{ p: '2px 4px', display: 'flex', width: 250 }}>
                 <InputBase
                     sx={{ ml: 1, flex: 1 }}
