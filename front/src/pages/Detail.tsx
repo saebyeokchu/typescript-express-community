@@ -17,6 +17,7 @@ export function Detail(){
         appendSearchTargetData,
         openPostEditDialog, 
         openPostDeleteDialog, 
+        openCommentDeleteDialog,
         addComment,
         setSearchKeyword
     } = useHygallContext()
@@ -41,7 +42,9 @@ export function Detail(){
                              post={post} 
                              openPostEditDialog={openPostEditDialog} 
                              openPostDeleteDialog={openPostDeleteDialog} 
+
                              addComment={addComment}
+                             openCommentDeleteDialog={openCommentDeleteDialog}
                         />
                         <PostList 
                             filteredMainList = {filteredMainList}

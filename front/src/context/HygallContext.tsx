@@ -2,10 +2,11 @@ import React, { createContext, ReactNode, useContext, useEffect, useState } from
 import { AlertColor } from "@mui/material";
 
 import { Messages, Post, Search } from "../data";
-import { AlertMessage, PostDeleteDialog, PostEditDialog, } from "../component";
+import { AlertMessage, PostDeleteDialog, PostEditDialog, CommentDeleteDialog } from "../component";
 
 import HygallRepository from "./HygallRepository";
-import { useAlert, usePostEditDialog, usePostDeleteDialog } from "../hook";
+import { useAlert, usePostEditDialog, usePostDeleteDialog, useCommentDeleteDialog } from "../hook";
+import { Message } from "@mui/icons-material";
 
 type HygallProviderPros = {
     children : ReactNode
@@ -37,6 +38,9 @@ type HygallContext = { //get, change, set
     closePostEditDialog : () => void
     openPostDeleteDialog : () => void
     closePostDeleteDialog : () => void
+
+    openCommentDeleteDialog: (targetCommentId : number) => void
+    closeCommentDeleteDialog : () => void
 
     mainList : Post.PostList[]
     post : Post.Post
@@ -70,6 +74,7 @@ export function HygallProvider ({children} : HygallProviderPros){
     const {alertState, onAlertStateChange, alertMessage, showAlertMessage} = useAlert()
     const [showPostEditDialog, setShowPostEditDialog] = usePostEditDialog()
     const [showPostDeleteDialog, setShowPostDeleteDialog] = usePostDeleteDialog()
+    const { showCommentDeleteDialog, setShowCommentDeleteDialog, targetCommentId, SetTargetCommentId } = useCommentDeleteDialog()
 
     useEffect(() => {
         if(mainList.length > 0) {
@@ -97,22 +102,6 @@ export function HygallProvider ({children} : HygallProviderPros){
             if(response.status === 200){
                 // console.log("before", post)
                 setPost(response.data[0] as Post.Post)
-                
-                //불러온 포스트 갈아 끼우기(임시)
-                mainList.forEach(e  => {
-                    if(e.contentId === contentId){
-                        e.viewCount++
-                    }
-                })
-
-                // if(tempIndex > -1){
-                //     mainList[tempIndex].viewCount = post.viewCount 
-                //     setMainList(mainList)
-                //     console.log(mainList)
-                // }
-                
-
-                // console.log("after", post)
             }else{
                 (onAlertStateChange as Function)(Messages.ErrorCode.Unkwoun)
             }
@@ -126,7 +115,13 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
 
         hygallRepository.increasePostViewCount(contentId)
-
+                        
+        //불러온 포스트 갈아 끼우기(임시)
+        mainList.forEach(e  => {
+            if(e.contentId === contentId){
+                e.viewCount++
+            }
+        })
         //나중에 로그만 남기기
     }
 
@@ -217,16 +212,23 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     //unlock code
-    const checkUnlockCode = async (inputUnlockCode : string) => {
-        const unlockCodeLength = inputUnlockCode.length;
-        if(unlockCodeLength < 4 || unlockCodeLength > 6){
+    const checkUnlockCodeLength = (length : number) => {
+        if(length < 4 || length > 6){
             onAlertStateChange(Messages.ErrorCode.ShortLockCode)
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    const checkUnlockCode = async (inputUnlockCode : string, from : string) => {
+        if(!checkUnlockCodeLength(inputUnlockCode.length)){
             return;
         }
 
         return await hygallRepository.checkUnlockCode(post.contentId, inputUnlockCode).then(response => {
             if(!response) {
-                (onAlertStateChange as Function)(Messages.ErrorCode.UnmatchedUnlockCode)
+                onAlertStateChange(Messages.ErrorCode.UnmatchedUnlockCode)
             }else{
                 closePostEditDialog()
             }
@@ -234,6 +236,23 @@ export function HygallProvider ({children} : HygallProviderPros){
             return response
         })
 
+    }
+
+    const checkUnlockCodeForComment = async (inputUnlockCode : string, commentId : number) => {
+        if(!checkUnlockCodeLength(inputUnlockCode.length)){
+            return;
+        }
+
+        return await hygallRepository.checkUnlockCodeForComment(post.contentId, commentId, inputUnlockCode).then(response => {
+            console.log(response)
+            if(!response) {
+                onAlertStateChange(Messages.ErrorCode.UnmatchedUnlockCode)
+            }else{
+                // closePostEditDialog()
+            }
+
+            return response
+        })
     }
 
     //comment
@@ -257,6 +276,12 @@ export function HygallProvider ({children} : HygallProviderPros){
         const response : boolean =  await hygallRepository.addComment(post.contentId, new Post.Comment({content, unlockCode}))
         
         if(response){
+            //임시 comment +1
+            mainList.forEach(e  => {
+                if(e.contentId === post.contentId){
+                    e.commentCount ++
+                }
+            })
             onAlertStateChange(Messages.ErrorCode.Success)
             getPost(post.contentId)
         }else{
@@ -266,10 +291,57 @@ export function HygallProvider ({children} : HygallProviderPros){
         return response
     }
 
+    const deleteComment = async (inputUnlockCode : string) => {
+        console.log(inputUnlockCode, targetCommentId)
+        
+        const unlockCodeCheckResult = await checkUnlockCodeForComment(inputUnlockCode, targetCommentId)
+        if(!unlockCodeCheckResult) {
+            return
+        }
+
+        if(post.contentId < 0 || targetCommentId < -1){
+            onAlertStateChange(Messages.ErrorCode.Unkwoun)
+            return
+        }
+        
+        return await hygallRepository.removeComment(post.contentId, targetCommentId).then(response => {
+            if(response === undefined){
+                return false
+            }
+            
+            if(response){
+                mainList.forEach(e  => {
+                    if(e.contentId === post.contentId){
+                        e.commentCount --
+                    }
+                })
+                getPost(post.contentId)
+                onAlertStateChange(Messages.ErrorCode.Success)
+                closeCommentDeleteDialog()
+            }else{
+                onAlertStateChange(Messages.ErrorCode.DeleteFail)
+            }
+    
+            return response
+        })
+    
+       }
+
     const openPostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
     const closePostEditDialog = () => (setShowPostEditDialog as React.Dispatch<React.SetStateAction<boolean>>)(false)
     const openPostDeleteDialog = () => (setShowPostDeleteDialog as React.Dispatch<React.SetStateAction<boolean>>)(true)
     const closePostDeleteDialog = () => (setShowPostDeleteDialog as React.Dispatch<React.SetStateAction<boolean>>)(false)
+
+    const openCommentDeleteDialog = (targetCommentId : number) => {
+        if(targetCommentId === undefined || targetCommentId < 0){
+            onAlertStateChange(Messages.ErrorCode.Unkwoun)
+            return
+        }
+
+        SetTargetCommentId(targetCommentId)
+        setShowCommentDeleteDialog(true)
+    }
+    const closeCommentDeleteDialog = () => setShowCommentDeleteDialog(false)
 
     return(
         <HygallContext.Provider value={{
@@ -290,6 +362,8 @@ export function HygallProvider ({children} : HygallProviderPros){
             closePostEditDialog,
             openPostDeleteDialog,
             closePostDeleteDialog,
+            openCommentDeleteDialog,
+            closeCommentDeleteDialog,
             mainList,
             post,
             filteredMainList,
@@ -303,6 +377,7 @@ export function HygallProvider ({children} : HygallProviderPros){
                 show={showAlertMessage as boolean} 
                 alertState={alertState as AlertColor} 
                 alertMessage={alertMessage as string}/>
+
             <PostDeleteDialog 
                 show={showPostDeleteDialog as boolean}
                 handleClose={closePostDeleteDialog}
@@ -314,6 +389,13 @@ export function HygallProvider ({children} : HygallProviderPros){
                 handleClose={closePostEditDialog}
                 checkUnlockCode={checkUnlockCode}
                 contentId={post? post.contentId : undefined}
+            />
+
+            <CommentDeleteDialog
+                show = {showCommentDeleteDialog}
+                handleClose = {closeCommentDeleteDialog}
+                deleteComment={deleteComment}
+                commentId = {targetCommentId}
             />
         </HygallContext.Provider>
     )

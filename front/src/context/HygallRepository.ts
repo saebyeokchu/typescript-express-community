@@ -60,4 +60,16 @@ export default class HygallRepository implements HygallRepositoryInterface{
             return response.status === 200
         })
     }
+
+    async removeComment(contentId : number, commentId : number) : Promise<boolean>{
+        return await axios.get(`${tempApiUrl}/removeComment/${contentId}&${commentId}`).then(response=> {
+            return response.status === 200
+        })
+    }
+
+    async checkUnlockCodeForComment(contentId : number, commentId : number, inputUnlockCode : string) : Promise<boolean> {
+        return await axios.post(`${tempApiUrl}/checkUnlockCodeForComment`,{contentId, commentId, inputUnlockCode}).then(response => {
+            return response.status === 200 ? response.data : false
+        })
+    }
 }
