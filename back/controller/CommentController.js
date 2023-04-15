@@ -6,8 +6,6 @@ export default function CommentController(app, router){
         const reqBody = req.body; 
         reqBody.unlockCode = Utils.getUnlockCode(reqBody.unlockCode)
         
-        console.log(reqBody
-            )
         CommentService.add(reqBody.contentId,reqBody.newComment).then(function(response){
             res.send(response)
         }) 

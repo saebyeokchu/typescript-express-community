@@ -1,18 +1,7 @@
 import { Post } from "../model/Post.js"
 
 const getLastCommentId = async (contentId) => { //need to improved
-    return await Post.find({ contentId }, 
-        {
-            contentId : 0, 
-            title : 0, 
-            content : 0, 
-            viewCount :0, 
-            commentCount : 0, 
-            createdCode :0,
-            unlockCode : 0, 
-            createdAt:0, 
-            comments : {$slice : 1}}
-        ).sort({"comments.id" : -1});
+    return await Post.aggregate([{$match: { contentId }}, {$unwind: "$comments"}, {$sort: {"comments.id": -1}},{$limit: 1},{$group: {"_id": "$comments.id"}}] )
 }
 
 const getCommentUnlockCode = async (contentId, commentId) => {
@@ -23,7 +12,7 @@ const getCommentUnlockCode = async (contentId, commentId) => {
 
 async function add(contentId, newComment) {
     const lastCommentIdQuery = await getLastCommentId(contentId);
-    const lastCommentId = lastCommentIdQuery[0]['comments'].length === 0 ? 0 : lastCommentIdQuery[0]['comments'][0]['id'] + 1;
+    const lastCommentId = lastCommentIdQuery.length > 0 ? lastCommentIdQuery[0]['_id'] + 1 : 0 ;
 
     newComment.id = lastCommentId;
     return Post.updateOne({contentId : contentId},{$push : {comments : newComment}, $inc : { commentCount : 1}})
