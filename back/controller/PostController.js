@@ -26,6 +26,13 @@ router.route("/increasePostViewCount/:contentId").get(function(req, res){
     }) 
 })
 
+//get post
+router.route("/increasePostLikeCount/:contentId").get(function(req, res){
+    PostService.increasePostLikeCount(req.params.contentId).then(function(response){
+        res.send(response)
+    }) 
+})
+
 //add new content
 app.post("/addPost", function(req, res){
     const reqBody = req.body;
