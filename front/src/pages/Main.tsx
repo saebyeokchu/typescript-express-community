@@ -17,7 +17,7 @@ export function Main(){
     } = useHygallContext()
 
     useEffect(() => {
-        cleanPostList()
+        // cleanPostList() 너무 깜빡거려서 잠깐 block
         getPostList()
         cleanPost()
     },[]) 

@@ -18,8 +18,10 @@ export default class HygallRepository implements HygallRepositoryInterface{
         })
     }
 
-    increasePostViewCount(contentId : number) : void{
-        axios.get(`${tempApiUrl}/increasePostViewCount/${contentId}`)
+    async increasePostViewCount(contentId : number) : Promise<boolean>{
+        return await axios.get(`${tempApiUrl}/increasePostViewCount/${contentId}`).then(response => {
+            return response.status === 200
+        })
     }
 
     async addPost(newPost : Post.Post) : Promise<boolean> { //async 필요없음
