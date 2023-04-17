@@ -6,6 +6,8 @@ export default interface HygallRepositoryInterface {
     getPostList() : Promise<AxiosResponse<any, any>>
     getPost(contentId : number) : Promise<AxiosResponse<any,any>>
     increasePostViewCount(contentId : number) : Promise<boolean>
+    increasePostLikeCount(contentId : number) : Promise<boolean>
+    
     addPost(newContent : Post.Post) : Promise<boolean>
     deletePost(contentId : number) : Promise<boolean>
     uploadImage(formData : FormData) : Promise<boolean | object>

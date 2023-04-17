@@ -6,7 +6,7 @@ import { AlertMessage, PostDeleteDialog, PostEditDialog, CommentDeleteDialog } f
 
 import HygallRepository from "./HygallRepository";
 import { useAlert, usePostEditDialog, usePostDeleteDialog, useCommentDeleteDialog } from "../hook";
-import { Message } from "@mui/icons-material";
+import { Iron, Message } from "@mui/icons-material";
 
 type HygallProviderPros = {
     children : ReactNode
@@ -24,6 +24,8 @@ type HygallContext = { //get, change, set
     getPostList : () => Promise<boolean>
     getPost : (contentId : number) => void
     increasePostViewCount : (contentId : number) => void
+    increasePostLikeCount  : () => void
+
     addPost : (title : string, content : string, unlockCode : string) => Promise<number | boolean>
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
@@ -142,6 +144,33 @@ export function HygallProvider ({children} : HygallProviderPros){
 
         return response
         //나중에 로그만 남기기
+    }
+
+    const increasePostLikeCount = async () => {
+        if(post === undefined) {
+            return false
+        }
+
+        let available = false;
+
+        //세션당 한번의 increase만 가능하게
+        const hygdbLikeList = localStorage.getItem('hygdbLikeList');
+
+        if(hygdbLikeList === null){
+            localStorage.setItem('hygdbLikeList',post.contentId + ",")
+            available = true
+        }else{
+            const likeList = hygdbLikeList.split(",").slice(0,-1)
+            if(likeList.find(e=>e===post.contentId.toString()) === undefined){
+                localStorage.setItem('hygdbLikeList',hygdbLikeList + post.contentId + ",")
+                available = true
+            }
+        }
+
+        if(available)
+            await hygallRepository.increasePostLikeCount(post.contentId).then((response : boolean) => {
+                if(response) getPost(post.contentId)
+            })
     }
 
     const addPost = async (title : string, content : string, unlockCode : string) => {
@@ -364,6 +393,7 @@ export function HygallProvider ({children} : HygallProviderPros){
             getPostList,
             getPost,
             increasePostViewCount,
+            increasePostLikeCount,
             addPost,
             editPost,
             deletePost,

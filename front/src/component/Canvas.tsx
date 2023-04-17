@@ -78,7 +78,7 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
         }
     },[])
 
-    const save = () => {
+    const save = async () => {
         if(!titleRef || !contentRef || !pwRef){
             return;
         }
@@ -90,9 +90,10 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
         //본문 place holder문제있음
         if(mode === "new"){
 
-            if(contentValue === "<p><br></p>") contentValue = undefined
+            if(contentRef?.current?.value === "<p><br></p>") contentValue = undefined
+            else contentValue = contentRef?.current?.value
 
-            const response = addPost(titleRef.current.value , contentValue, pwRef.current.value);
+            const response = await addPost(titleRef.current.value , contentValue, pwRef.current.value);
 
             if(typeof(response) === "number"){
                 navigate(`/detail/${response}`)

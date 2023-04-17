@@ -16,6 +16,7 @@ export function Detail(){
 
         getPostList,
         getDetailPageData,
+        increasePostLikeCount,
         appendSearchTargetData,
         openPostEditDialog, 
         openPostDeleteDialog, 
@@ -54,6 +55,7 @@ export function Detail(){
 
                              addComment={addComment}
                              openCommentDeleteDialog={openCommentDeleteDialog}
+                             increasePostLikeCount={increasePostLikeCount}
                         />
                         <PostList 
                             filteredMainList = {filteredMainList}

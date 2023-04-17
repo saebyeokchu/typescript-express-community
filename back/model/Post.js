@@ -17,6 +17,9 @@ const postSchema = new Schema({
     viewCount : {
         type : Number
     },
+    likeCount : {
+        type : Number
+    },
     commentCount : {
         type : Number
     },
