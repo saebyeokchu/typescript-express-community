@@ -125,7 +125,7 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const increasePostViewCount = async (contentId : number = -1) => {
-        if(contentId === -1 || contentId < 1) {
+        if(contentId < 0) {
             return false
         }
 
@@ -145,7 +145,6 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const addPost = async (title : string, content : string, unlockCode : string) => {
-
        if(unlockCode.length < 4){
            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
            return false
@@ -263,7 +262,6 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
 
         return await hygallRepository.checkUnlockCodeForComment(post.contentId, commentId, inputUnlockCode).then(response => {
-            console.log(response)
             if(!response) {
                 onAlertStateChange(Messages.ErrorCode.UnmatchedUnlockCode)
             }else{
@@ -311,8 +309,6 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const deleteComment = async (inputUnlockCode : string) => {
-        console.log(inputUnlockCode, targetCommentId)
-        
         const unlockCodeCheckResult = await checkUnlockCodeForComment(inputUnlockCode, targetCommentId)
         if(!unlockCodeCheckResult) {
             return

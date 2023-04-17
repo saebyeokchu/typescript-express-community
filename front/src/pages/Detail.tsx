@@ -14,6 +14,7 @@ export function Detail(){
         searchTargetData,
         filteredMainList,
 
+        getPostList,
         getDetailPageData,
         appendSearchTargetData,
         openPostEditDialog, 
@@ -29,11 +30,11 @@ export function Detail(){
     }
 
     useEffect(() => { 
-        if(contentId === undefined){
-            return
-        }
+        if(filteredMainList === undefined || filteredMainList.length === 0) getPostList()
+
+        if(contentId === undefined) return
         getDetailPageData(parseInt(contentId))
-    },[]) 
+    },[contentId]) 
 
     useEffect(() => {
         if(post){

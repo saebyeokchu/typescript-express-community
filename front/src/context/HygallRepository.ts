@@ -31,8 +31,6 @@ export default class HygallRepository implements HygallRepositoryInterface{
     }
 
     async editPost(contentId : number, title : string, content : string, ) : Promise<boolean> { //async 필요없음
-        console.log(contentId, title, content)
-
         return await axios.post(`${tempApiUrl}/editPost`,{contentId, title, content}).then(response => {
             return response.status === 200
         })
