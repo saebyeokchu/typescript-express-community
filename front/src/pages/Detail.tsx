@@ -10,10 +10,12 @@ export function Detail(){
     const navigate = useNavigate()
     let { contentId } = useParams()
     const { 
-        getPost, 
         post,
         searchTargetData,
         filteredMainList,
+
+        getPostList,
+        getDetailPageData,
         appendSearchTargetData,
         openPostEditDialog, 
         openPostDeleteDialog, 
@@ -23,9 +25,16 @@ export function Detail(){
     } = useHygallContext()
     let postAvailable = false 
 
+    if(contentId === undefined){
+        return <Notice errorCode={Messages.ErrorCode.LoadFail} reactElement={<Button variant="contained" onClick={() => navigate("/")}>목록으로</Button>} variant={undefined}/> 
+    }
+
     useEffect(() => { 
-        getPost(parseInt(contentId as string))
-    },[]) 
+        if(filteredMainList === undefined || filteredMainList.length === 0) getPostList()
+
+        if(contentId === undefined) return
+        getDetailPageData(parseInt(contentId))
+    },[contentId]) 
 
     useEffect(() => {
         if(post){

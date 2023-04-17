@@ -21,7 +21,9 @@ router.route("/getPost/:contentId").get(function(req, res){
 
 //get post
 router.route("/increasePostViewCount/:contentId").get(function(req, res){
-    PostService.increasePostViewCount(req.params.contentId);
+    PostService.increasePostViewCount(req.params.contentId).then(function(response){
+        res.send(response)
+    }) 
 })
 
 //add new content

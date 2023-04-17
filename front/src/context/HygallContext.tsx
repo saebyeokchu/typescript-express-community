@@ -18,6 +18,9 @@ type uploadResponse = {
 }
 
 type HygallContext = { //get, change, set
+    //service, 분리 고민
+    getDetailPageData : (contentId : number) => Promise<boolean>
+
     getPostList : () => Promise<boolean>
     getPost : (contentId : number) => void
     increasePostViewCount : (contentId : number) => void
@@ -82,6 +85,18 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
     },[mainList, searchKeyword, listBreakPoint])
 
+    //처음에 detail page를 조회할때
+
+    const getDetailPageData = async (contentId : number) => {
+        //update view count
+        return await increasePostViewCount(contentId).then(async (response : boolean) => {
+            if(response){
+                await getPost(contentId)
+            }
+            return response
+        })
+    }
+
     const getPostList = async () => {
         //refresh 할때만 불러오면 좋겠다
         return await hygallRepository.getPostList().then(response => {
@@ -109,24 +124,27 @@ export function HygallProvider ({children} : HygallProviderPros){
        
     }
 
-    const increasePostViewCount = (contentId : number = -1) => {
-        if(contentId === -1 || contentId < 1) {
-            return
+    const increasePostViewCount = async (contentId : number = -1) => {
+        if(contentId < 0) {
+            return false
         }
 
-        hygallRepository.increasePostViewCount(contentId)
+        const response =  await hygallRepository.increasePostViewCount(contentId)
                         
         //불러온 포스트 갈아 끼우기(임시)
-        mainList.forEach(e  => {
-            if(e.contentId === contentId){
-                e.viewCount++
-            }
-        })
+        if(response){
+            mainList.forEach(e  => {
+                if(e.contentId === contentId){
+                    e.viewCount++
+                }
+            })
+        }
+
+        return response
         //나중에 로그만 남기기
     }
 
     const addPost = async (title : string, content : string, unlockCode : string) => {
-
        if(unlockCode.length < 4){
            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
            return false
@@ -145,18 +163,18 @@ export function HygallProvider ({children} : HygallProviderPros){
 
    const editPost = async (title : string, content : string) => {
 
-    const alertMsg = onAlertStateChange as Function
+        const alertMsg = onAlertStateChange as Function
 
-   if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
-    alertMsg(Messages.ErrorCode.NoAddContent)
-       return false
-   }
+    if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
+        alertMsg(Messages.ErrorCode.NoAddContent)
+        return false
+    }
 
-   return await hygallRepository.editPost(post.contentId, title, content).then((res)=>{
-    alertMsg(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
-       return res
-   });
-}
+    return await hygallRepository.editPost(post.contentId, title, content).then((res)=>{
+        alertMsg(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+        return res
+    });
+    }
 
    const deletePost = async () => {
     if(post.contentId < 1) {
@@ -244,7 +262,6 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
 
         return await hygallRepository.checkUnlockCodeForComment(post.contentId, commentId, inputUnlockCode).then(response => {
-            console.log(response)
             if(!response) {
                 onAlertStateChange(Messages.ErrorCode.UnmatchedUnlockCode)
             }else{
@@ -292,8 +309,6 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const deleteComment = async (inputUnlockCode : string) => {
-        console.log(inputUnlockCode, targetCommentId)
-        
         const unlockCodeCheckResult = await checkUnlockCodeForComment(inputUnlockCode, targetCommentId)
         if(!unlockCodeCheckResult) {
             return
@@ -345,6 +360,7 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     return(
         <HygallContext.Provider value={{
+            getDetailPageData,
             getPostList,
             getPost,
             increasePostViewCount,

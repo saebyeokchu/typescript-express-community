@@ -23,7 +23,7 @@ type PostDetailProps = {
 }
 
 function Comment({comment, openCommentDeleteDialog} : CommentProps){ 
-    return(
+    return( 
         <Card sx={{borderBottom:`1px ${Constant.ColorCode.lightGrey} solid`}}>
             <CardContent>
                 <Box sx={{justifyContent:'space-between', alignItems: 'center'}} display="flex">

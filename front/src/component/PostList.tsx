@@ -103,6 +103,7 @@ export function PostList( { filteredMainList, searchTargetData, appendSearchTarg
   // console.log("ContentsList : ", filteredMainList, searchTargetData)
 
   const moveToDetail = (contentId : number | undefined) => {
+    console.log(`move to ${contentId}`)
     if(contentId === undefined){
       onAlertStateChange(Messages.ErrorCode.Unkwoun)
     }else{
