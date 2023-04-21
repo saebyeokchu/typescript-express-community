@@ -30,7 +30,7 @@ type HygallContext = { //get, change, set
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
 
-    addComment : (commentContnet : string) => Promise<boolean>
+    addComment : (content : string, unlockCode : string) => Promise<boolean>
 
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : Search.SearchTargetData) => void
@@ -306,7 +306,7 @@ export function HygallProvider ({children} : HygallProviderPros){
         const unlockCodeLength = unlockCode.length;
         if(unlockCodeLength < 4 || unlockCodeLength > 6){
             onAlertStateChange(Messages.ErrorCode.ShortLockCode)
-            return;
+            return false;
         }
 
         if(!content) {
