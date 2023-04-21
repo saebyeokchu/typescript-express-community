@@ -45,13 +45,16 @@ function Comment({comment, openCommentDeleteDialog} : CommentProps){
 }
 
 export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, addComment, openCommentDeleteDialog, increasePostLikeCount } : PostDetailProps){
-    const commentRef = useRef<string>()
-    const pwRef = useRef<string>()
+    const commentRef = useRef<HTMLInputElement>()
+    const pwRef = useRef<HTMLInputElement>()
 
     const handleCommentButtonClicked = async () => {
         if(commentRef && commentRef.current && pwRef && pwRef.current){
             await addComment(commentRef.current.value, pwRef.current.value).then((response : boolean) => {
                 if(response){
+                    if(!(commentRef && commentRef.current && pwRef && pwRef.current)){
+                        return
+                    }
                     commentRef.current.value = ""
                     pwRef.current.value = ""
                 }

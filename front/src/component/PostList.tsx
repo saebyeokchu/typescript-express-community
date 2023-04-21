@@ -12,7 +12,6 @@ interface TablePaginationActionsProps {
   page : number
   rowsPerPage : number
   onPageChange : (
-    event : React.MouseEvent<HTMLButtonElement>,
     newPage : number
   ) => void
 }
@@ -28,41 +27,39 @@ function TablePaginationActions(props : TablePaginationActionsProps){
   const totalPage = Math.floor( (count % rowsPerPage) && (count % rowsPerPage)  ? count / rowsPerPage + 1 : count / rowsPerPage)
 
   const handleFirstPageButtonClick = (
-    event : React.MouseEvent<HTMLButtonElement>,
   ) => {
-    onPageChange(event, 0)
+    onPageChange( 0)
   }
 
-  const handleBackButtonClick = (event : React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, page-1)
+  const handleBackButtonClick = () => {
+    onPageChange( page-1)
   }
 
-  const handleNextButtonClick = (event : React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event,page + 1)
+  const handleNextButtonClick = () => {
+    onPageChange(page + 1)
   }
 
   const handleLastPageButtonClick = (event : React.MouseEvent<HTMLButtonElement>) => {
-    onPageChange(event, Math.max(0, Math.ceil(count/rowsPerPage) - 1))
+    onPageChange(Math.max(0, Math.ceil(count/rowsPerPage) - 1))
   }
 
   const handlePaginationClick = (
-    event : React.ChangeEvent<HTMLButtonElement>,
     value : number
   ) => { 
-    onPageChange(event,value-1)
+    onPageChange(value-1)
   }
 
 
   return (
     <Box sx={{justifyContent:'center', display:'flex', p:2}}>
-      <Pagination onChange={handlePaginationClick} count={totalPage}  siblingCount={2} boundaryCount={0}/>
+      <Pagination onChange={(e,value) => handlePaginationClick(value)} count={totalPage}  siblingCount={2} boundaryCount={0}/>
     </Box>
   )
  
 }
 
 
-export function PostList( { filteredMainList, searchTargetData, appendSearchTargetData, increasePostViewCount } : PostListProps ) {  
+export function PostList( { filteredMainList, searchTargetData, appendSearchTargetData } : PostListProps ) {  
   const navigate = useNavigate() 
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
@@ -88,7 +85,6 @@ export function PostList( { filteredMainList, searchTargetData, appendSearchTarg
   const emptyRows = page > 0? Math.max(0, (1+page) *rowsPerPage-filteredMainList.length) : 0;
 
   const handleChangePage = ( 
-    event : React.ChangeEvent<unknown>,
     newPage : number
   ) => {
     setPage(newPage)
