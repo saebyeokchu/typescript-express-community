@@ -20,10 +20,11 @@ type PostDetailProps = {
 
     addComment : Function
     openCommentDeleteDialog : Function
+    increasePostLikeCount : Function
 }
 
 function Comment({comment, openCommentDeleteDialog} : CommentProps){ 
-    return(
+    return( 
         <Card sx={{borderBottom:`1px ${Constant.ColorCode.lightGrey} solid`}}>
             <CardContent>
                 <Box sx={{justifyContent:'space-between', alignItems: 'center'}} display="flex">
@@ -43,14 +44,17 @@ function Comment({comment, openCommentDeleteDialog} : CommentProps){
     )
 }
 
-export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, addComment, openCommentDeleteDialog } : PostDetailProps){
-    const commentRef = useRef<string>()
-    const pwRef = useRef<string>()
+export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, addComment, openCommentDeleteDialog, increasePostLikeCount } : PostDetailProps){
+    const commentRef = useRef<HTMLInputElement>()
+    const pwRef = useRef<HTMLInputElement>()
 
     const handleCommentButtonClicked = async () => {
         if(commentRef && commentRef.current && pwRef && pwRef.current){
             await addComment(commentRef.current.value, pwRef.current.value).then((response : boolean) => {
                 if(response){
+                    if(!(commentRef && commentRef.current && pwRef && pwRef.current)){
+                        return
+                    }
                     commentRef.current.value = ""
                     pwRef.current.value = ""
                 }
@@ -93,7 +97,7 @@ export function PostDetail( { post, openPostEditDialog, openPostDeleteDialog, ad
                                 width:'100%', 
                                 gap:'10px'}}>
                                 <Button variant="contained" size="small">댓글 {post.commentCount}</Button>
-                                <Button variant="contained" color="warning" size="small">좋아요 {post.like}</Button>
+                                <Button variant="contained" color="warning" size="small" onClick={()=>increasePostLikeCount()}>좋아요 {post.likeCount}</Button>
                                 <Button variant="contained" size="small" onClick={()=>openPostEditDialog()}>수정</Button>
                                 <Button variant="contained" onClick={()=>openPostDeleteDialog()} size="small">삭제</Button>
                             </Box>

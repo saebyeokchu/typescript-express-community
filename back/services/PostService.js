@@ -21,7 +21,11 @@ const getPostUnlockCode = async (contentId) => {
 }
 
 const increasePostViewCount = async (contentId) => {
-    await Post.updateOne({contentId},{$inc : { viewCount : 1 }});
+    return await Post.updateOne({contentId},{$inc : { viewCount : 1 }});
+}
+
+const increasePostLikeCount = async (contentId) => {
+    return await Post.updateOne({contentId},{$inc : { likeCount : 1 }});
 }
 
 const addPost = async (newContent) => {
@@ -48,6 +52,7 @@ export {
     getPost,
     getPostUnlockCode,
     increasePostViewCount,
+    increasePostLikeCount,
     addPost,
     editPost,
     deletePost

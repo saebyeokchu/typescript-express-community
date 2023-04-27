@@ -8,7 +8,7 @@ const PostTemplate : Post = {
     viewCount: 200,
     createdAt: '2023-03-04 11:23:58',
     unlockCode: '123456',
-    like:0,
+    likeCount:0,
     comments: [
         {
             id: 1,
@@ -50,7 +50,7 @@ class Post{
     content : string = ""
     commentCount : number = 0
     viewCount : number = 0
-    like : number = 0
+    likeCount : number = 0
     createdAt : string = ""
     comments : Comment[] = []
     unlockCode : string = ""
@@ -61,10 +61,6 @@ class Post{
         //this.contentId = count + 1 //나중에 자동 increase 시키면 좋겠다
         this.createdAt = moment().format("YYYY-MM-DD hh:mm:ss")//날짜 설정하기
     }
-
-   public isEmpty(){
-     return this.title === "" || this.content === ""
-   }
 }
 
 const PostListTemplate : PostList = { //temp

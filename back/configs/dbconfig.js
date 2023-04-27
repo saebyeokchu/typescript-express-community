@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 export default function dbconfig(){
-    mongoose.connect("mongodb://localhost:27017/hygdb",{
+    mongoose.connect("mongodb://localhost:27017/hygall1",{
         useNewUrlParser:true
     });
     

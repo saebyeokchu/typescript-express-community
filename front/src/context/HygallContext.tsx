@@ -6,7 +6,7 @@ import { AlertMessage, PostDeleteDialog, PostEditDialog, CommentDeleteDialog } f
 
 import HygallRepository from "./HygallRepository";
 import { useAlert, usePostEditDialog, usePostDeleteDialog, useCommentDeleteDialog } from "../hook";
-import { Message } from "@mui/icons-material";
+import { Iron, Message } from "@mui/icons-material";
 
 type HygallProviderPros = {
     children : ReactNode
@@ -18,15 +18,19 @@ type uploadResponse = {
 }
 
 type HygallContext = { //get, change, set
+    //service, 분리 고민
+    getDetailPageData : (contentId : number) => Promise<boolean>
+
     getPostList : () => Promise<boolean>
     getPost : (contentId : number) => void
-    getPostForDetailView 
-    increasePostViewCount : (contentId : number) => Promise<boolean>
+    increasePostViewCount : (contentId : number) => void
+    increasePostLikeCount  : () => void
+
     addPost : (title : string, content : string, unlockCode : string) => Promise<number | boolean>
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
 
-    addComment : (commentContnet : string) => Promise<boolean>
+    addComment : (content : string, unlockCode : string) => Promise<boolean>
 
     setListBreakPoint : (breakPoint : number) => void
     appendSearchTargetData : (searchTargetData : Search.SearchTargetData) => void
@@ -83,6 +87,18 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
     },[mainList, searchKeyword, listBreakPoint])
 
+    //처음에 detail page를 조회할때
+
+    const getDetailPageData = async (contentId : number) => {
+        //update view count
+        return await increasePostViewCount(contentId).then(async (response : boolean) => {
+            if(response){
+                await getPost(contentId)
+            }
+            return response
+        })
+    }
+
     const getPostList = async () => {
         //refresh 할때만 불러오면 좋겠다
         return await hygallRepository.getPostList().then(response => {
@@ -111,6 +127,7 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const increasePostViewCount = async (contentId : number = -1) => {
+<<<<<<< HEAD
         if(contentId === -1 || contentId < 1) {
             return
         }
@@ -121,6 +138,16 @@ export function HygallProvider ({children} : HygallProviderPros){
 
         if(response){
             //불러온 포스트 갈아 끼우기(임시)
+=======
+        if(contentId < 0) {
+            return false
+        }
+
+        const response =  await hygallRepository.increasePostViewCount(contentId)
+                        
+        //불러온 포스트 갈아 끼우기(임시)
+        if(response){
+>>>>>>> fda641cd4f4c2791d6cf66fc2921283d92c3125a
             mainList.forEach(e  => {
                 if(e.contentId === contentId){
                     e.viewCount++
@@ -133,8 +160,34 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     }
 
-    const addPost = async (title : string, content : string, unlockCode : string) => {
+    const increasePostLikeCount = async () => {
+        if(post === undefined) {
+            return false
+        }
 
+        let available = false;
+
+        //세션당 한번의 increase만 가능하게
+        const hygdbLikeList = localStorage.getItem('hygdbLikeList');
+
+        if(hygdbLikeList === null){
+            localStorage.setItem('hygdbLikeList',post.contentId + ",")
+            available = true
+        }else{
+            const likeList = hygdbLikeList.split(",").slice(0,-1)
+            if(likeList.find(e=>e===post.contentId.toString()) === undefined){
+                localStorage.setItem('hygdbLikeList',hygdbLikeList + post.contentId + ",")
+                available = true
+            }
+        }
+
+        if(available)
+            await hygallRepository.increasePostLikeCount(post.contentId).then((response : boolean) => {
+                if(response) getPost(post.contentId)
+            })
+    }
+
+    const addPost = async (title : string, content : string, unlockCode : string) => {
        if(unlockCode.length < 4){
            onAlertStateChange(Messages.ErrorCode.ShortLockCode)
            return false
@@ -153,18 +206,18 @@ export function HygallProvider ({children} : HygallProviderPros){
 
    const editPost = async (title : string, content : string) => {
 
-    const alertMsg = onAlertStateChange as Function
+        const alertMsg = onAlertStateChange as Function
 
-   if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
-    alertMsg(Messages.ErrorCode.NoAddContent)
-       return false
-   }
+    if(!title || !content) {//둘중 하나라도 값이 없으면 리턴
+        alertMsg(Messages.ErrorCode.NoAddContent)
+        return false
+    }
 
-   return await hygallRepository.editPost(post.contentId, title, content).then((res)=>{
-    alertMsg(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
-       return res
-   });
-}
+    return await hygallRepository.editPost(post.contentId, title, content).then((res)=>{
+        alertMsg(res ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+        return res
+    });
+    }
 
    const deletePost = async () => {
     if(post.contentId < 1) {
@@ -252,7 +305,6 @@ export function HygallProvider ({children} : HygallProviderPros){
         }
 
         return await hygallRepository.checkUnlockCodeForComment(post.contentId, commentId, inputUnlockCode).then(response => {
-            console.log(response)
             if(!response) {
                 onAlertStateChange(Messages.ErrorCode.UnmatchedUnlockCode)
             }else{
@@ -268,7 +320,7 @@ export function HygallProvider ({children} : HygallProviderPros){
         const unlockCodeLength = unlockCode.length;
         if(unlockCodeLength < 4 || unlockCodeLength > 6){
             onAlertStateChange(Messages.ErrorCode.ShortLockCode)
-            return;
+            return false;
         }
 
         if(!content) {
@@ -300,8 +352,6 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const deleteComment = async (inputUnlockCode : string) => {
-        console.log(inputUnlockCode, targetCommentId)
-        
         const unlockCodeCheckResult = await checkUnlockCodeForComment(inputUnlockCode, targetCommentId)
         if(!unlockCodeCheckResult) {
             return
@@ -353,9 +403,11 @@ export function HygallProvider ({children} : HygallProviderPros){
 
     return(
         <HygallContext.Provider value={{
+            getDetailPageData,
             getPostList,
             getPost,
             increasePostViewCount,
+            increasePostLikeCount,
             addPost,
             editPost,
             deletePost,

@@ -28,6 +28,7 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
     const pwRef = useRef<any>()
 
     const postAvailable = post != undefined && post.contentId > 0 && location.pathname.includes("edit")
+    let contentValue = contentRef?.current?.value || undefined;
 
     if(mode===undefined || mode === "") {
         return <Loading />
@@ -77,7 +78,7 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
         }
     },[])
 
-    const save = () => {
+    const save = async () => {
         if(!titleRef || !contentRef || !pwRef){
             return;
         }
@@ -88,14 +89,19 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
 
         //본문 place holder문제있음
         if(mode === "new"){
-            addPost(titleRef.current.value , contentRef.current.value, pwRef.current.value).then((res : boolean | number) => {
-                if(typeof(res) === "number"){
-                    navigate(`/detail/${res}`)
-                }
-            })
+
+            if(contentRef?.current?.value === "<p><br></p>") contentValue = undefined
+            else contentValue = contentRef?.current?.value
+
+            const response = await addPost(titleRef.current.value , contentValue, pwRef.current.value);
+
+            if(typeof(response) === "number"){
+                navigate(`/detail/${response}`)
+            }
+
         }else{
-            editPost(titleRef.current.value , contentRef.current.value).then(res => {
-                if(res){
+            editPost(titleRef.current.value , contentRef.current.value).then((response : boolean) => {
+                if(response && post !== undefined){
                     navigate(`/detail/${post.contentId}`) 
                 }
             })
@@ -146,7 +152,7 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
                     modules={modules}
                     ref={contentRef}
                     style={{height : Constant.MiddlePaperSize - 150}}
-                    value={postAvailable? post.content : ""}
+                    value={postAvailable? post.content : contentValue ? contentValue : ""}
                 />
                 <InputBase //숫자만 accept하기
                         fullWidth
@@ -156,6 +162,7 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
                         inputProps={{ maxLength : 6}}
                         type={postAvailable ? "text" : "password"}
                         disabled={postAvailable ? true : false}
+                        autoComplete = "off"
                 /> 
             </Paper>
             <Box sx={{display:'flex',p:"0.5rem",gap :"10px", justifyContent:'flex-end',flexDirection:'row',backgroundColor:Constant.ColorCode.darkBlue}}>

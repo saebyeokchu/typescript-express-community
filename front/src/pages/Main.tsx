@@ -17,7 +17,7 @@ export function Main(){
     } = useHygallContext()
 
     useEffect(() => {
-        // cleanPostList() 여기가 깜빡거리게 만드는건가?
+        // cleanPostList() 너무 깜빡거려서 잠깐 block
         getPostList()
         cleanPost()
     },[]) 

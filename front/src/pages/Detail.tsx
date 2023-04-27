@@ -11,10 +11,13 @@ export function Detail(){
     let { contentId } = useParams()
 
     const { 
-        getPost, 
         post,
         searchTargetData,
         filteredMainList,
+
+        getPostList,
+        getDetailPageData,
+        increasePostLikeCount,
         appendSearchTargetData,
         openPostEditDialog, 
         openPostDeleteDialog, 
@@ -26,11 +29,16 @@ export function Detail(){
 
     let postAvailable = false 
 
+    if(contentId === undefined){
+        return <Notice errorCode={Messages.ErrorCode.LoadFail} reactElement={<Button variant="contained" onClick={() => navigate("/")}>목록으로</Button>} variant={undefined}/> 
+    }
+
     useEffect(() => { 
-        getPostForDetailView()
-        increasePostViewCount(parseInt(contentId as string))
-        getPost(parseInt(contentId as string))
-    },[]) 
+        if(filteredMainList === undefined || filteredMainList.length === 0) getPostList()
+
+        if(contentId === undefined) return
+        getDetailPageData(parseInt(contentId))
+    },[contentId]) 
 
     useEffect(() => {
         if(post){
@@ -50,6 +58,7 @@ export function Detail(){
 
                              addComment={addComment}
                              openCommentDeleteDialog={openCommentDeleteDialog}
+                             increasePostLikeCount={increasePostLikeCount}
                         />
                         <PostList 
                             filteredMainList = {filteredMainList}
