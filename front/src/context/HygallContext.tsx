@@ -127,18 +127,6 @@ export function HygallProvider ({children} : HygallProviderPros){
     }
 
     const increasePostViewCount = async (contentId : number = -1) => {
-<<<<<<< HEAD
-        if(contentId === -1 || contentId < 1) {
-            return
-        }
-
-        const response = await hygallRepository.increasePostViewCount(contentId)
-
-        console.log("increasePostViewCount.response", response)
-
-        if(response){
-            //불러온 포스트 갈아 끼우기(임시)
-=======
         if(contentId < 0) {
             return false
         }
@@ -147,7 +135,6 @@ export function HygallProvider ({children} : HygallProviderPros){
                         
         //불러온 포스트 갈아 끼우기(임시)
         if(response){
->>>>>>> fda641cd4f4c2791d6cf66fc2921283d92c3125a
             mainList.forEach(e  => {
                 if(e.contentId === contentId){
                     e.viewCount++
@@ -200,6 +187,14 @@ export function HygallProvider ({children} : HygallProviderPros){
 
        return await hygallRepository.addPost(new Post.Post(mainList.length,{title, content, unlockCode})).then((res : boolean | number)=>{
            onAlertStateChange(typeof(res) === "number" ? Messages.ErrorCode.Success : Messages.ErrorCode.AddFail)
+
+           if(typeof(res) === "number"){
+            onAlertStateChange(Messages.ErrorCode.Success)
+            getPostList()
+           }else{
+            onAlertStateChange(Messages.ErrorCode.AddFail)
+           }
+
            return res
        });
    }
