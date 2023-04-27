@@ -9,6 +9,7 @@ import { Messages } from "../data";
 export function Detail(){
     const navigate = useNavigate()
     let { contentId } = useParams()
+
     const { 
         getPost, 
         post,
@@ -19,11 +20,15 @@ export function Detail(){
         openPostDeleteDialog, 
         openCommentDeleteDialog,
         addComment,
-        setSearchKeyword
+        setSearchKeyword,
+        increasePostViewCount
     } = useHygallContext()
+
     let postAvailable = false 
 
     useEffect(() => { 
+        getPostForDetailView()
+        increasePostViewCount(parseInt(contentId as string))
         getPost(parseInt(contentId as string))
     },[]) 
 

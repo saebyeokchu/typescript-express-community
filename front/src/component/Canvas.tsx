@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Paper, InputBase, Box, Button } from "@mui/material"
 
 import { Constant, Post } from "../data"
@@ -20,13 +20,14 @@ type CanvasProps = {
  
 //image ref ; https://stackoverflow.com/questions/68997364/how-to-upload-image-inside-react-quill-content
 export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} : CanvasProps){
-    const navigate = useNavigate();
+    const navigate = useNavigate()
+    const location = useLocation()
 
     const titleRef = useRef<any>()
     let contentRef = useRef<any>()
     const pwRef = useRef<any>()
 
-    const postAvailable = post != undefined && post.contentId > 0;
+    const postAvailable = post != undefined && post.contentId > 0 && location.pathname.includes("edit")
 
     if(mode===undefined || mode === "") {
         return <Loading />
@@ -145,7 +146,7 @@ export function Canvas({mode, post, addPost, uploadImage, cleanPost, editPost} :
                     modules={modules}
                     ref={contentRef}
                     style={{height : Constant.MiddlePaperSize - 150}}
-                    // value={postAvailable? post.content : ""}
+                    value={postAvailable? post.content : ""}
                 />
                 <InputBase //숫자만 accept하기
                         fullWidth

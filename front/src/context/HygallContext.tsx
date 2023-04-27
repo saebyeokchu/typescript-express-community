@@ -20,7 +20,8 @@ type uploadResponse = {
 type HygallContext = { //get, change, set
     getPostList : () => Promise<boolean>
     getPost : (contentId : number) => void
-    increasePostViewCount : (contentId : number) => void
+    getPostForDetailView 
+    increasePostViewCount : (contentId : number) => Promise<boolean>
     addPost : (title : string, content : string, unlockCode : string) => Promise<number | boolean>
     editPost : (title : string, content : string) => Promise<boolean>
     deletePost : () => Promise<boolean | undefined>
@@ -103,26 +104,33 @@ export function HygallProvider ({children} : HygallProviderPros){
                 // console.log("before", post)
                 setPost(response.data[0] as Post.Post)
             }else{
-                (onAlertStateChange as Function)(Messages.ErrorCode.Unkwoun)
+                onAlertStateChange(Messages.ErrorCode.Unkwoun)
             }
         })
        
     }
 
-    const increasePostViewCount = (contentId : number = -1) => {
+    const increasePostViewCount = async (contentId : number = -1) => {
         if(contentId === -1 || contentId < 1) {
             return
         }
 
-        hygallRepository.increasePostViewCount(contentId)
-                        
-        //불러온 포스트 갈아 끼우기(임시)
-        mainList.forEach(e  => {
-            if(e.contentId === contentId){
-                e.viewCount++
-            }
-        })
+        const response = await hygallRepository.increasePostViewCount(contentId)
+
+        console.log("increasePostViewCount.response", response)
+
+        if(response){
+            //불러온 포스트 갈아 끼우기(임시)
+            mainList.forEach(e  => {
+                if(e.contentId === contentId){
+                    e.viewCount++
+                }
+            })
+        }
+
+        return response
         //나중에 로그만 남기기
+
     }
 
     const addPost = async (title : string, content : string, unlockCode : string) => {

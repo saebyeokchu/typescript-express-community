@@ -13,7 +13,6 @@ const getPostList = async () => {
 }
 
 const getPost = async (contentId) => {
-    await increasePostViewCount(contentId);
     return await Post.find({contentId}, {_id : 0, unlockCode : 0});
 }
 
